@@ -18,7 +18,7 @@ namespace stan {
                 bool save,
                 stan::io::mcmc_writer
                 <Model,SampleRecorder,DiagnosticRecorder,MessageRecorder>& writer,
-                stan::mcmc::sample& init_s,
+                std::vector<stan::mcmc::sample>& init_s,
                 Model& model,
                 RNG& base_rng,
                 const std::string& prefix,

@@ -26,13 +26,13 @@ namespace stan {
       
       ~adapt_diag_e_nuts() {};
       
-      sample transition(sample& init_sample) {
+      std::vector<sample> transition(std::vector<sample>& init_sample) {
         
-        sample s = diag_e_nuts<M, BaseRNG>::transition(init_sample);
+        std::vector<sample> s = diag_e_nuts<M, BaseRNG>::transition(init_sample);
         
         if (this->_adapt_flag) {
         
-          this->_stepsize_adaptation.learn_stepsize(this->_nom_epsilon, s.accept_stat());
+          this->_stepsize_adaptation.learn_stepsize(this->_nom_epsilon, s[0].accept_stat());
           
           bool update = this->_var_adaptation.learn_variance(this->_z.mInv, this->_z.q);
           

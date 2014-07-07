@@ -27,9 +27,11 @@ namespace stan {
       { this->_name = "Mock HMC"; }
       
       
-      sample transition(sample& init_sample) {
-        this->seed(init_sample.cont_params());
-        return sample(this->_z.q, - this->_hamiltonian.V(this->_z), 0);
+      std::vector<sample> transition(std::vector<sample>& init_sample) {
+        this->seed(init_sample[0].cont_params());
+        std::vector<sample> s;
+        s.push_back(sample(this->_z.q, - this->_hamiltonian.V(this->_z), 0));
+        return s;
       }
       
       void write_sampler_param_names(std::ostream& o) {};

@@ -110,7 +110,7 @@ namespace stan {
                                M& model) {
         std::vector<double> values;
         
-        sample.get_sample_params(values);
+        sample.get_sample_params(values); //FIXME: for ensembles
         sampler.get_sampler_params(values);
         
         Eigen::VectorXd model_values;

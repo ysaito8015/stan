@@ -24,12 +24,12 @@ namespace stan {
       
       ~adapt_unit_e_nuts() {};
       
-      sample transition(sample& init_sample) {
+      std::vector<sample> transition(std::vector<sample>& init_sample) {
         
-        sample s = unit_e_nuts<M, BaseRNG>::transition(init_sample);
+        std::vector<sample> s = unit_e_nuts<M, BaseRNG>::transition(init_sample);
         
         if (this->_adapt_flag)
-          this->_stepsize_adaptation.learn_stepsize(this->_nom_epsilon, s.accept_stat());
+          this->_stepsize_adaptation.learn_stepsize(this->_nom_epsilon, s[0].accept_stat());
         
         return s;
         

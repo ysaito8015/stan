@@ -27,13 +27,13 @@ namespace stan {
       
       ~adapt_dense_e_static_hmc() {};
       
-      sample transition(sample& init_sample) {
+      std::vector<sample> transition(std::vector<sample>& init_sample) {
         
-        sample s = dense_e_static_hmc<M, BaseRNG>::transition(init_sample);
+        std::vector<sample> s = dense_e_static_hmc<M, BaseRNG>::transition(init_sample);
         
         if (this->_adapt_flag) {
           
-          this->_stepsize_adaptation.learn_stepsize(this->_nom_epsilon, s.accept_stat());
+          this->_stepsize_adaptation.learn_stepsize(this->_nom_epsilon, s[0].accept_stat());
           this->_update_L();
           
           bool update = this->_covar_adaptation.learn_covariance(this->_z.mInv, this->_z.q);
