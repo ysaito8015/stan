@@ -95,12 +95,12 @@ namespace stan {
 
       double log_prob(Eigen::VectorXd& q) {
         try {
-          _model.stan::model::prob_grad_ad::log_prob(q, this->_err_stream);
+          _model.template log_prob<false,false>(q, this->_err_stream);
         } catch (std::domain_error e) {
           this->_write_error_msg(this->_err_stream, e);
           return std::numeric_limits<double>::infinity();
         }
-        return _model.stan::model::prob_grad_ad::log_prob(q, this->_err_stream);
+        return _model.template log_prob<false,false>(q, this->_err_stream);
       }
 
       sample transition(sample& init_sample) {
