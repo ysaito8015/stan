@@ -71,7 +71,7 @@ Model model(dummy_context);
 
 stan::mcmc::mock_ensemble sampler(model, base_rng, &output, &error);
 
-TEST(McmcBaseEnsemble, construction) {
+TEST(McmcEnsembleBaseEnsemble, construction) {
   EXPECT_FLOAT_EQ(2, sampler.get_params_size());
   EXPECT_FLOAT_EQ(2*2+1, sampler.get_current_states_size());
   EXPECT_FLOAT_EQ(2*2+1, sampler.get_new_states_size());
@@ -82,12 +82,12 @@ TEST(McmcBaseEnsemble, construction) {
   EXPECT_EQ("", error.str());
 }
 
-TEST(McmcBaseEnsemble, write_sampler_state) {
+TEST(McmcEnsembleBaseEnsemble, write_sampler_state) {
   sampler.write_sampler_state(&output);
   EXPECT_TRUE("# Scale = 2\n" == output.str());
 }
 
-TEST(McmcBaseEnsemble, get_sampler_diagnostic_names) {
+TEST(McmcEnsembleBaseEnsemble, get_sampler_diagnostic_names) {
   std::vector<std::string> test_model_names;
   std::vector<std::string> test_names;
   test_model_names.push_back("x");
@@ -103,21 +103,21 @@ TEST(McmcBaseEnsemble, get_sampler_diagnostic_names) {
   EXPECT_TRUE("y" == test_names[1]);
 }
 
-TEST(McmcBaseEnsemble, get_sampler_diagnostics) {
+TEST(McmcEnsembleBaseEnsemble, get_sampler_diagnostics) {
   std::vector<double> test_values;
 
   sampler.get_sampler_diagnostics(test_values);
   EXPECT_FLOAT_EQ(2, test_values.size());
 }
 
-TEST(McmcBaseEnsemble, get_params) {
+TEST(McmcEnsembleBaseEnsemble, get_params) {
   std::vector<double> test_values;
 
   sampler.get_params(test_values);
   EXPECT_FLOAT_EQ(2, test_values.size());
 }
 
-TEST(McmcBaseEnsemble, get_params_names) {
+TEST(McmcEnsembleBaseEnsemble, get_params_names) {
   std::vector<std::string> test_model_names;
   std::vector<std::string> test_names;
   test_model_names.push_back("x");
@@ -133,21 +133,21 @@ TEST(McmcBaseEnsemble, get_params_names) {
   EXPECT_TRUE("y" == test_names[1]);
 }
 
-TEST(McmcBaseEnsemble, write_sampler_param_names) {
+TEST(McmcEnsembleBaseEnsemble, write_sampler_param_names) {
   std::stringstream output2;
 
   sampler.write_sampler_param_names(output2);
   EXPECT_TRUE("scale__,"==output2.str());
 }
 
-TEST(McmcBaseEnsemble, write_sampler_params) {
+TEST(McmcEnsembleBaseEnsemble, write_sampler_params) {
   std::stringstream output3;
 
   sampler.write_sampler_params(output3);
   EXPECT_TRUE("2,"==output3.str());
 }
 
-TEST(McmcBaseEnsemble, get_sampler_param_names) {
+TEST(McmcEnsembleBaseEnsemble, get_sampler_param_names) {
   std::vector<std::string> test_names;
 
   sampler.get_sampler_param_names(test_names);
@@ -155,7 +155,7 @@ TEST(McmcBaseEnsemble, get_sampler_param_names) {
   EXPECT_TRUE("scale__" == test_names[0]);
 }
 
-TEST(McmcBaseEnsemble, get_sampler_params) {
+TEST(McmcEnsembleBaseEnsemble, get_sampler_params) {
   std::vector<double> values;
 
   sampler.get_sampler_params(values);
@@ -163,17 +163,17 @@ TEST(McmcBaseEnsemble, get_sampler_params) {
   EXPECT_FLOAT_EQ(2, values[0]);
 }
 
-TEST(McmcBaseEnsemble, get_scale) {
+TEST(McmcEnsembleBaseEnsemble, get_scale) {
   EXPECT_FLOAT_EQ(2, sampler.get_scale());
 }
 
-TEST(McmcBaseEnsemble, set_scale) {
+TEST(McmcEnsembleBaseEnsemble, set_scale) {
   EXPECT_FLOAT_EQ(2, sampler.get_scale());
   EXPECT_NO_THROW(sampler.set_scale(3));
   EXPECT_FLOAT_EQ(3, sampler.get_scale());
 }
 
-TEST(McmcBaseEnsemble, sample_z) {
+TEST(McmcEnsembleBaseEnsemble, sample_z) {
   boost::random::mt19937 rng;
   int N = 10000;
   int K = boost::math::round(2 * std::pow(N, 0.4));
@@ -210,7 +210,7 @@ TEST(McmcBaseEnsemble, sample_z) {
 
 }
 
-TEST(McmcBaseEnsemble, initialize_ensemble) {
+TEST(McmcEnsembleBaseEnsemble, initialize_ensemble) {
   sampler.initialize_ensemble();
 
   EXPECT_FLOAT_EQ(2*2+1, sampler.get_current_states_size());
@@ -230,7 +230,7 @@ TEST(McmcBaseEnsemble, initialize_ensemble) {
   EXPECT_FLOAT_EQ(calc_param_means(1), param_means(1));
 }
 
-TEST(McmcBaseEnsemble, initialize_chi_square_goodness_of_fit) {
+TEST(McmcEnsembleBaseEnsemble, initialize_chi_square_goodness_of_fit) {
   boost::random::mt19937 rng;
   int N = 10000;
   int K = boost::math::round(2 * std::pow(N, 0.4));
@@ -271,7 +271,7 @@ TEST(McmcBaseEnsemble, initialize_chi_square_goodness_of_fit) {
   } 
 }
 
-TEST(McmcBaseEnsemble, transition) {
+TEST(McmcEnsembleBaseEnsemble, transition) {
   Eigen::VectorXd a(2);
   a<<1,-1;
   stan::mcmc::sample s0(a,-1,0.3);
