@@ -22,6 +22,7 @@
 #include <stan/gm/arguments/arg_random.hpp>
 #include <stan/gm/arguments/arg_output.hpp>
 
+#include <stan/mcmc/ensemble/stretch_move_ensemble.hpp>
 #include <stan/mcmc/fixed_param_sampler.hpp>
 #include <stan/mcmc/hmc/static/adapt_unit_e_static_hmc.hpp>
 #include <stan/mcmc/hmc/static/adapt_diag_e_static_hmc.hpp>
@@ -614,31 +615,13 @@ namespace stan {
           return 0;
         
         } else if (algo->value() == "stretch_ensemble") {
-          // Headers
-          writer.write_sample_names(s, sampler_ptr, model);
-          writer.write_diagnostic_names(s, sampler_ptr, model);
-        
-          std::string prefix = "";
-          std::string suffix = "\n";
-          NoOpFunctor startTransitionCallback;
 
-        
-          // Sampling
-          clock_t start = clock();
+          typedef stan::mcmc::stretch_move_ensemble<Model, rng_t> sampler;
+          sampler_ptr = new sampler(model, base_rng, &std::cout, &std::cout);
           
-          sample<Model, rng_t>(sampler_ptr, 0, num_samples, num_thin,
-                               refresh, true,
-                               writer,
-                               s, model, base_rng,
-                               prefix, suffix, std::cout,
-                               startTransitionCallback);
-          
-          clock_t end = clock();
-          sampleDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
-          
-          writer.write_timing(warmDeltaT, sampleDeltaT);
-        
-        if (sampler_ptr) delete sampler_ptr;
+          adapt_engaged = false;
+
+          num_warmup = 0;
 
         } else if (algo->value() == "hmc") {
           
@@ -768,18 +751,18 @@ namespace stan {
           }
           
         }
-        
+
         // Headers
         writer.write_sample_names(s, sampler_ptr, model);
+
         writer.write_diagnostic_names(s, sampler_ptr, model);
-        
+
         std::string prefix = "";
         std::string suffix = "\n";
         NoOpFunctor startTransitionCallback;
 
         // Warm-Up
         clock_t start = clock();
-        
         warmup<Model, rng_t>(sampler_ptr, num_warmup, num_samples, num_thin,
                              refresh, save_warmup,
                              writer,
@@ -789,12 +772,12 @@ namespace stan {
         
         clock_t end = clock();
         warmDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
-        
+
         if (adapt_engaged) {
           dynamic_cast<mcmc::base_adapter*>(sampler_ptr)->disengage_adaptation();
           writer.write_adapt_finish(sampler_ptr);
         }
-        
+
         // Sampling
         start = clock();
         
@@ -813,20 +796,20 @@ namespace stan {
         if (sampler_ptr) delete sampler_ptr;
         
       }
-      
+
       if (output_stream) {
         output_stream->close();
         delete output_stream;
       }
-        
+ 
       if (diagnostic_stream) {
         diagnostic_stream->close();
         delete diagnostic_stream;
       }
-      
+
       for (size_t i = 0; i < valid_arguments.size(); ++i)
         delete valid_arguments.at(i);
-      
+
       return 0;
  
     }

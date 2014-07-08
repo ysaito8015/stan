@@ -30,7 +30,6 @@ namespace stan {
                           StartTransitionCallback& callback) {
       for (int m = 0; m < num_iterations; ++m) {
         callback();
-        
         print_progress(m, start, finish, refresh, warmup, prefix, suffix, o);
       
         init_s = sampler->transition(init_s);

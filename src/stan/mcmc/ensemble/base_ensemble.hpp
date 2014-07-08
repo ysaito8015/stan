@@ -107,6 +107,7 @@ namespace stan {
         _params_mean.setZero();
         _logp.setZero();
         _accept_prob.setZero();
+
         for (int i = 0; i < _new_states.size(); i++) 
           _new_states[i].setZero();
 

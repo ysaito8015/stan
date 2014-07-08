@@ -5,6 +5,7 @@
 
 #include <stan/gm/arguments/arg_hmc.hpp>
 #include <stan/gm/arguments/arg_fixed_param.hpp>
+#include <stan/gm/arguments/arg_stretch_ensemble.hpp>
 
 namespace stan {
   
@@ -21,6 +22,7 @@ namespace stan {
         
         _values.push_back(new arg_hmc());
         _values.push_back(new arg_fixed_param());
+        _values.push_back(new arg_stretch_ensemble());
         
         _default_cursor = 0;
         _cursor = _default_cursor;

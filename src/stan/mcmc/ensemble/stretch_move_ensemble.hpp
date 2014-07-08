@@ -48,8 +48,8 @@ namespace stan {
           double z = this->sample_z();
 
           //proposes new walker position
-          new_states[i] = cur_states[rand_unif] + z
-            * (cur_states[i] - cur_states[rand_unif]);
+          new_states[i] = cur_states[rand_unif-1] + z
+            * (cur_states[i] - cur_states[rand_unif-1]);
 
           //calculate new log prob
           logp(i) = this->log_prob(new_states[i]);
@@ -62,7 +62,7 @@ namespace stan {
             * std::exp(logp(i) - logp0);
 
           accept_prob(i) = accept_prob(i) > 1 ? 1 : accept_prob(i);
-          
+
           if (this->_rand_uniform() > accept_prob(i)) {
             new_states[i] = cur_states[i];
             logp(i) = logp0;
