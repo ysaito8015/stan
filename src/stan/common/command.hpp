@@ -613,6 +613,33 @@ namespace stan {
           std::cout << algo->arg("rwm")->description() << std::endl;
           return 0;
         
+        } else if (algo->value() == "stretch_ensemble") {
+          // Headers
+          writer.write_sample_names(s, sampler_ptr, model);
+          writer.write_diagnostic_names(s, sampler_ptr, model);
+        
+          std::string prefix = "";
+          std::string suffix = "\n";
+          NoOpFunctor startTransitionCallback;
+
+        
+          // Sampling
+          clock_t start = clock();
+          
+          sample<Model, rng_t>(sampler_ptr, 0, num_samples, num_thin,
+                               refresh, true,
+                               writer,
+                               s, model, base_rng,
+                               prefix, suffix, std::cout,
+                               startTransitionCallback);
+          
+          clock_t end = clock();
+          sampleDeltaT = (double)(end - start) / CLOCKS_PER_SEC;
+          
+          writer.write_timing(warmDeltaT, sampleDeltaT);
+        
+        if (sampler_ptr) delete sampler_ptr;
+
         } else if (algo->value() == "hmc") {
           
           int engine_index = 0;
