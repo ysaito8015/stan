@@ -9,6 +9,7 @@
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/sample.hpp>
 #include <stan/model/prob_grad.hpp>
+#include <stan/math/matrix/Eigen.hpp>
 
 #include <stan/common/recorder/csv.hpp>
 
@@ -105,22 +106,40 @@ namespace stan {
        */
       template <class RNG>
       void write_sample_params(RNG& rng, 
-                               stan::mcmc::sample& sample,
+                               std::vector<stan::mcmc::sample>& sample,
                                stan::mcmc::base_mcmc& sampler,
                                M& model) {
         std::vector<double> values;
-        
-        sample.get_sample_params(values); //FIXME: for ensembles
+        std::vector<double> temp_params;
+        std::vector<double> mean_params;
+        Eigen::VectorXd temp_cont_params(sample[0].size_cont());
+        Eigen::VectorXd mean_cont_params(sample[0].size_cont());
+
+        for (int i = 0; i < sample.size(); i++) {
+          temp_params.clear();
+          sample[i].get_sample_params(temp_params);
+          sample[i].cont_params(temp_cont_params);
+
+          mean_params.resize(temp_params.size());
+          for (int j = 0; j < temp_params.size(); j++) {
+            mean_params[j] += temp_params[j] / sample.size();
+          }
+
+          mean_cont_params += temp_cont_params / sample.size();
+        }
+
+        for (int j = 0; j < temp_params.size(); j++)
+          values.push_back(mean_params[j]);
+
         sampler.get_sampler_params(values);
-        
         Eigen::VectorXd model_values;
-        
+
         model.write_array(rng,
-                          const_cast<Eigen::VectorXd&>(sample.cont_params()),
+                          mean_cont_params,
                           model_values,
                           true, true,
                           msg_stream_); 
-        
+
         for (int i = 0; i < model_values.size(); ++i)
           values.push_back(model_values(i));
 
@@ -200,11 +219,23 @@ namespace stan {
        *   sample's get_sample_params(), the sampler's get_sampler_params(),
        *   and get_sampler_diagnostics()
        */
-      void write_diagnostic_params(stan::mcmc::sample& sample,
+      void write_diagnostic_params(std::vector<stan::mcmc::sample>& sample,
                                    stan::mcmc::base_mcmc* sampler) {
         std::vector<double> values;
-        
-        sample.get_sample_params(values);
+        std::vector<double> temp_params;
+        std::vector<double> mean_params;
+
+        for (int i = 0; i < sample.size(); i++) {
+          temp_params.clear();
+          sample[i].get_sample_params(temp_params);
+          mean_params.resize(temp_params.size());
+          for (int j = 0; j < temp_params.size(); j++)
+            mean_params[j] += temp_params[j] / sample.size();
+        }
+
+        for (int j = 0; j < temp_params.size(); j++)
+          values.push_back(mean_params[j]);
+
         sampler->get_sampler_params(values);
         sampler->get_sampler_diagnostics(values);
         

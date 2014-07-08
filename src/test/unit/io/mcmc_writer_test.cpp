@@ -83,8 +83,10 @@ TEST(StanIoMcmcWriter, write_sample_params) {
   double log_prob = 3.14;
   double accept_stat = 0.84;
   
-  stan::mcmc::sample sample(real, log_prob, accept_stat);
-  
+  stan::mcmc::sample sample0(real, log_prob, accept_stat);
+  std::vector<stan::mcmc::sample> sample;
+  sample.push_back(sample0);
+
   // Sampler
   typedef boost::ecuyer1988 rng_t;
   rng_t base_rng(0);
@@ -295,8 +297,10 @@ TEST(StanIoMcmcWriter, write_diagnostic_params) {
   double log_prob = 3.14;
   double accept_stat = 0.84;
   
-  stan::mcmc::sample sample(real, log_prob, accept_stat);
-  
+  stan::mcmc::sample sample0(real, log_prob, accept_stat);
+  std::vector<stan::mcmc::sample> sample;
+  sample.push_back(sample0);
+
   // Sampler
   typedef boost::ecuyer1988 rng_t;
   rng_t base_rng(0);

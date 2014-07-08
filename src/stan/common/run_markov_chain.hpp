@@ -36,8 +36,8 @@ namespace stan {
         init_s = sampler->transition(init_s);
           
         if ( save && ( (m % num_thin) == 0) ) {
-          writer.write_sample_params(base_rng, init_s[0], *sampler, model); //FIXME: for ensembles
-          writer.write_diagnostic_params(init_s[0], sampler); //FIXME: for ensembles
+          writer.write_sample_params(base_rng, init_s, *sampler, model); //FIXME: for ensembles
+          writer.write_diagnostic_params(init_s, sampler); //FIXME: for ensembles
         }
 
       }
