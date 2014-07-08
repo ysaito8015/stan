@@ -25,11 +25,11 @@ namespace stan {
       
       ~base_static_hmc() {};
       
-      std::vector<sample> transition(std::vector<sample>& init_sample) {
+      sample transition(sample& init_sample) {
         
         this->sample_stepsize();
         
-        this->seed(init_sample[0].cont_params());
+        this->seed(init_sample.cont_params());
         
         this->_hamiltonian.sample_p(this->_z, this->_rand_int);
         this->_hamiltonian.init(this->_z);
@@ -53,10 +53,7 @@ namespace stan {
         
         acceptProb = acceptProb > 1 ? 1 : acceptProb;
         
-        std::vector<sample> s;
-        s.push_back(sample(this->_z.q, - this->_hamiltonian.V(this->_z), acceptProb));
-
-        return s;
+        return sample(this->_z.q, - this->_hamiltonian.V(this->_z), acceptProb);
         
       }
       

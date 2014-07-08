@@ -10,7 +10,7 @@ public:
   mock_sampler(std::ostream *output, std::ostream *error)
     : base_mcmc(output, error), n_transition_called(0) { }
 
-  std::vector<stan::mcmc::sample> transition(std::vector<stan::mcmc::sample>& init_sample) {
+  stan::mcmc::sample transition(stan::mcmc::sample& init_sample) {
     n_transition_called++;
     return init_sample;
   }
@@ -99,14 +99,11 @@ TEST_F(StanCommon, run_markov_chain) {
   int refresh = 4;
   bool save = false;
   bool warmup = false;
-  stan::mcmc::sample s0(q, log_prob, stat);
+  stan::mcmc::sample s(q, log_prob, stat);
   std::string prefix = "";
   std::string suffix = "\n";
   std::stringstream ss;
   mock_callback callback;
-
-  std::vector<stan::mcmc::sample> s;
-  s.push_back(s0);
 
   stan::common::run_markov_chain(sampler,
                                  num_iterations, start, finish,

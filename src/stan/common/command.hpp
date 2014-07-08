@@ -575,10 +575,8 @@ namespace stan {
         bool save_warmup = dynamic_cast<stan::gm::bool_argument*>(
                            parser.arg("method")->arg("sample")->arg("save_warmup"))->value();
         
-        stan::mcmc::sample s_0(cont_params, 0, 0);
-        std::vector<stan::mcmc::sample> s;
-        s.push_back(s_0);
-
+        stan::mcmc::sample s(cont_params, 0, 0);
+        
         double warmDeltaT;
         double sampleDeltaT;
         

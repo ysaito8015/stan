@@ -53,14 +53,14 @@ namespace stan {
       int get_max_depth() { return this->_max_depth; }
       double get_max_delta() { return this->_max_delta; }
       
-      std::vector<sample> transition(std::vector<sample>& init_sample) {
+      sample transition(sample& init_sample) {
         
         // Initialize the algorithm
         this->sample_stepsize();
         
         nuts_util util;
         
-        this->seed(init_sample[0].cont_params());
+        this->seed(init_sample.cont_params());
         
         this->_hamiltonian.sample_p(this->_z, this->_rand_int);
         this->_hamiltonian.init(this->_z);
@@ -71,7 +71,7 @@ namespace stan {
         ps_point z_sample(z_plus);
         ps_point z_propose(z_plus);
         
-        int n_cont = init_sample[0].cont_params().size();
+        int n_cont = init_sample.cont_params().size();
         
         Eigen::VectorXd rho_init = this->_z.p;
         Eigen::VectorXd rho_plus(n_cont); rho_plus.setZero();
@@ -148,11 +148,7 @@ namespace stan {
         double accept_prob = util.sum_prob / static_cast<double>(util.n_tree);
         
         this->_z.ps_point::operator=(z_sample);
-
-        std::vector<sample> s;
-        s.push_back(sample(this->_z.q, - this->_z.V, accept_prob));
-
-        return s;
+        return sample(this->_z.q, - this->_z.V, accept_prob);
         
       }
       
