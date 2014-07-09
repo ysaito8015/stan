@@ -23,6 +23,7 @@
 #include <stan/gm/arguments/arg_output.hpp>
 
 #include <stan/mcmc/ensemble/stretch_move_ensemble.hpp>
+#include <stan/mcmc/ensemble/walk_move_ensemble.hpp>
 #include <stan/mcmc/fixed_param_sampler.hpp>
 #include <stan/mcmc/hmc/static/adapt_unit_e_static_hmc.hpp>
 #include <stan/mcmc/hmc/static/adapt_diag_e_static_hmc.hpp>
@@ -617,6 +618,15 @@ namespace stan {
         } else if (algo->value() == "stretch_ensemble") {
 
           typedef stan::mcmc::stretch_move_ensemble<Model, rng_t> sampler;
+          sampler_ptr = new sampler(model, base_rng, &std::cout, &std::cout);
+          
+          adapt_engaged = false;
+
+          num_warmup = 0;
+
+        } else if (algo->value() == "walk_ensemble") {
+
+          typedef stan::mcmc::walk_move_ensemble<Model, rng_t> sampler;
           sampler_ptr = new sampler(model, base_rng, &std::cout, &std::cout);
           
           adapt_engaged = false;
