@@ -178,6 +178,7 @@ TEST(McmcEnsembleBaseEnsemble, sample_z) {
   int N = 10000;
   int K = boost::math::round(2 * std::pow(N, 0.4));
   boost::math::chi_squared mydist(K-1);
+  sampler.set_scale(2);
 
   double loc[K - 1];
   for(int i = 1; i < K; i++)
@@ -221,9 +222,9 @@ TEST(McmcEnsembleBaseEnsemble, initialize_ensemble) {
   Eigen::VectorXd calc_param_means(2);
   calc_param_means.setZero();
 
-  for (int j = 0; j < 2; j++) {
-    for (int i = 0; i < 5; i++)
-       calc_param_means(j) += cur_states[i](j) / 5.0;
+  for (int j = 0; j < sampler.get_params_size(); j++) {
+    for (int i = 0; i < sampler.get_current_states_size(); i++)
+       calc_param_means(j) += cur_states[i](j) / sampler.get_current_states_size();
   }     
 
   EXPECT_FLOAT_EQ(calc_param_means(0), param_means(0));
