@@ -27,21 +27,27 @@ namespace stan {
         this->initialize_ensemble();
       } 
 
+      int choose_walker(int& index, int& num_walkers) {
+        boost::random::uniform_int_distribution<> 
+          dist(1, num_walkers - 1);         
+        int rand_unif = dist(this->_rand_int);
+          if (rand_unif >= index+1)
+            rand_unif += 1;
+          return rand_unif;
+      }
+      
       void ensemble_transition(std::vector<Eigen::VectorXd>& cur_states,
                                std::vector<Eigen::VectorXd>& new_states,
                                Eigen::VectorXd& logp,
                                Eigen::VectorXd& accept_prob) {
-
         for (int i = 0; i < cur_states.size(); i++) {
+
           //calculate initial logprob for walker i
           double logp0 = this->log_prob(cur_states[i]);
 
           //generates index of random walker that is not currently being moved
-          boost::random::uniform_int_distribution<> 
-            dist(1, cur_states.size() - 1);         
-          int rand_unif = dist(this->_rand_int);
-          if (rand_unif >= i)
-            rand_unif += 1;
+          int num_walkers = cur_states.size();
+          int rand_unif = choose_walker(i, num_walkers);
 
           //generates sample from distribution with pdf 1/sqrt(z) 
           //with domain [1/a,a]

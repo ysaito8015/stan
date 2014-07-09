@@ -66,9 +66,9 @@ TEST(McmcEnsembleStretchMoveEnsemble, construction) {
   Eigen::VectorXd calc_param_means(2);
   calc_param_means.setZero();
 
-  for (int j = 0; j < 2; j++) {
-    for (int i = 0; i < 5; i++)
-      calc_param_means(j) += cur_states[i](j) / 5.0;
+  for (int j = 0; j < sampler.get_params_mean().size(); j++) {
+    for (int i = 0; i < sampler.get_current_states().size(); i++)
+      calc_param_means(j) += cur_states[i](j) / sampler.get_current_states().size();
   }     
 
   EXPECT_FLOAT_EQ(calc_param_means(0), param_means(0));
@@ -86,8 +86,8 @@ TEST(McmcEnsembleStretchMoveEnsemble, construction_chi_square_goodness_of_fit) {
   for(int i = 1; i < K; i++)
     loc[i - 1] = quantile(dist, i * std::pow(K, -1.0));
 
-  for (int i = 0; i < sampler.get_current_states_size(); i++) {
-    for (int j = 0; j < sampler.get_current_states()[i].size(); j++) {
+  for (int i_ = 0; i_ < sampler.get_current_states_size(); i_++) {
+    for (int j_ = 0; j_ < sampler.get_current_states()[i_].size(); j_++) {
       int count = 0;
       int bin [K];
       double expect [K];
@@ -98,7 +98,7 @@ TEST(McmcEnsembleStretchMoveEnsemble, construction_chi_square_goodness_of_fit) {
 
       while (count < N) {
         sampler.initialize_ensemble();
-        double a = sampler.get_current_states()[i](j);
+        double a = sampler.get_current_states()[i_](j_);
         int i = 0;
         while (i < K-1 && a > loc[i]) 
           ++i;
@@ -134,4 +134,45 @@ TEST(McmcEnsembleStretchMoveEnsemble, write_metric) {
   sampler.write_metric(&output);
   EXPECT_TRUE("# No free parameters for stretch move ensemble sampler\n"
               == output.str());
+}
+
+TEST(McmcEnsembleStretchMoveEnsemble, choose_walker) {
+  boost::random::mt19937 rng;
+  int N = 10000;
+  for (int n_walker = 2; n_walker < 20; n_walker++) {
+    for (int i_walker = 0; i_walker < n_walker; i_walker++) {
+      int K = n_walker;
+      boost::math::chi_squared mydist(K-1);
+      int loc[K - 1];
+      for(int i = 1; i < K; i++)
+        loc[i - 1] = i;
+
+      int count = 0;
+      int bin [K];
+      double expect [K];
+      for(int i = 0 ; i < K; i++) {
+        bin[i] = 0;
+        expect[i] = N / (K-1);
+      }
+    
+      expect[i_walker] = 1;
+
+      while (count < N) {
+        int a = sampler.choose_walker(i_walker, n_walker);
+        int i = 0;
+        while (i < K-1 && a > loc[i])
+          ++i;
+        ++bin[i];
+        count++;
+      }
+      
+      double chi = 0;
+      
+      for(int j = 0; j < K; j++)
+        chi += ((bin[j] - expect[j]) * (bin[j] - expect[j]) / expect[j]);
+
+      EXPECT_TRUE(chi < quantile(complement(mydist, 1e-6)));
+
+    }
+  }
 }

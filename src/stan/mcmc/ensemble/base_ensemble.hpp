@@ -89,7 +89,7 @@ namespace stan {
       double get_scale() { return this->_scale; }
       
       double sample_z() {
-        return pow(stan::prob::uniform_rng(0.0, 1.0, _rand_int) * (_scale -1)
+        return pow(stan::prob::uniform_rng(0.0, 1.0, _rand_int) * (_scale - 1.0)
                    + 1, 2) / _scale;
       }
 
