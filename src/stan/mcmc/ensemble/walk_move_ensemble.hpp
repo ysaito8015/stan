@@ -7,6 +7,7 @@
 
 #include <stan/mcmc/ensemble/base_ensemble.hpp>
 #include <stan/prob/distributions/univariate/discrete/bernoulli.hpp>
+#include <stan/prob/distributions/univariate/continuous/normal.hpp>
 
 namespace stan {
   
@@ -74,13 +75,13 @@ namespace stan {
           //generates index of random walker that is not currently being moved
           int num_walkers = cur_states.size();
           std::vector<int> rand_walkers = choose_walkers(i, num_walkers);
-
           Eigen::VectorXd mean_rand_walkers = mean_walkers(rand_walkers, cur_states);
 
           //proposes new walker position
-          for (int j = 0; j < rand_walkers.size(); j++) 
-            new_states[i] += this->sample_z() * (cur_states[rand_walkers[j]]
-                                                 - mean_rand_walkers);
+          new_states[i] = cur_states[i];
+          for (int j = 0; j < rand_walkers.size(); j++)
+            new_states[i] += stan::prob::normal_rng(0.0, 1.0, this->_rand_int)
+              * (cur_states[rand_walkers[j]-1] - mean_rand_walkers);
 
           //calculate new log prob
           logp(i) = this->log_prob(new_states[i]);
