@@ -13,7 +13,7 @@ namespace stan {
   
   namespace mcmc {
     
-    // Ensemble Sampler
+    // Ensemble Sampler using Walk Move
         
     template <class M, class BaseRNG>
     class walk_move_ensemble: public base_ensemble<M,BaseRNG> {
@@ -28,8 +28,9 @@ namespace stan {
         this->initialize_ensemble();
       } 
 
+      // index is from 0 to num_walkers - 1
       // returns vector from 1 to num_walkers
-      std::vector<int> choose_walkers(int& index, int& num_walkers) {
+      std::vector<int> choose_walkers(const int& index, const int& num_walkers) {
         std::vector<int> walkers;
 
         while (walkers.size() <= 1) {
@@ -49,8 +50,8 @@ namespace stan {
       }
 
       // walker_index is a vector of values ranging from 1 to num_walkers
-      Eigen::VectorXd mean_walkers(std::vector<int>& walker_index, 
-                                   std::vector<Eigen::VectorXd>& cur_states) {
+      Eigen::VectorXd mean_walkers(const std::vector<int>& walker_index, 
+                                   const std::vector<Eigen::VectorXd>& cur_states) {
 
         Eigen::VectorXd mean(cur_states[0].size());
         mean.setZero();

@@ -95,12 +95,12 @@ namespace stan {
 
       double log_prob(Eigen::VectorXd& q) {
         try {
-          _model.template log_prob<false,false>(q, this->_err_stream);
+          _model.template log_prob<false,true>(q, this->_err_stream);
         } catch (std::domain_error e) {
           this->_write_error_msg(this->_err_stream, e);
           return std::numeric_limits<double>::infinity();
         }
-        return _model.template log_prob<false,false>(q, this->_err_stream);
+        return _model.template log_prob<false,true>(q, this->_err_stream);
       }
 
       sample transition(sample& init_sample) {
@@ -115,7 +115,7 @@ namespace stan {
 
         for (int j = 0; j < _params_mean.size(); j++) {
           for (int i = 0; i < _current_states.size(); i++)
-            _params_mean(j) += _new_states[i](j) / _current_states.size();
+            _params_mean(j) += _new_states[i](j) / _current_states.size();      
         }
 
         _current_states = _new_states;
@@ -128,7 +128,7 @@ namespace stan {
           _current_states[i].resize(_params_mean.size());
           _new_states[i].resize(_params_mean.size());
           for (int j = 0; j < _current_states[i].size(); j++) {
-            _current_states[i](j) = _rand_uniform() - 0.5;
+            _current_states[i](j) = stan::prob::uniform_rng(-2.0,2.0,_rand_int);
           }
         }
         
@@ -136,7 +136,7 @@ namespace stan {
         for (int j = 0; j < _params_mean.size(); j++) {
           for (int i = 0; i < _current_states.size(); i++)
             _params_mean(j) += _current_states[i](j) / _current_states.size();
-        }     
+        }
       }
 
 

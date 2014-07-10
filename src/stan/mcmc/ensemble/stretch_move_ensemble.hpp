@@ -12,7 +12,7 @@ namespace stan {
   
   namespace mcmc {
     
-    // Ensemble Sampler
+    // Ensemble Sampler using Stretch Move
         
     template <class M, class BaseRNG>
     class stretch_move_ensemble: public base_ensemble<M,BaseRNG> {
@@ -27,7 +27,9 @@ namespace stan {
         this->initialize_ensemble();
       } 
 
-      int choose_walker(int& index, int& num_walkers) {
+      // index is from 0 to num_walker -1
+      // returns walker number (from 1 to num_walker)
+      int choose_walker(const int& index, const int& num_walkers) {
         boost::random::uniform_int_distribution<> 
           dist(1, num_walkers - 1);         
         int rand_unif = dist(this->_rand_int);
