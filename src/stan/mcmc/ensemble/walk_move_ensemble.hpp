@@ -8,6 +8,7 @@
 #include <stan/mcmc/ensemble/base_ensemble.hpp>
 #include <stan/prob/distributions/univariate/discrete/bernoulli.hpp>
 #include <stan/prob/distributions/univariate/continuous/normal.hpp>
+#include <stan/io/dump.hpp>
 
 namespace stan {
   
@@ -21,9 +22,10 @@ namespace stan {
     public:
       
       walk_move_ensemble(M& m, BaseRNG& rng,
-                            std::ostream* o = &std::cout, 
-                            std::ostream* e = 0)
-        : base_ensemble<M,BaseRNG>(m,rng,o,e) {
+                         stan::io::var_context& context,
+                         std::ostream* o = &std::cout, 
+                         std::ostream* e = 0)
+        : base_ensemble<M,BaseRNG>(m,rng,context,o,e) {
         this->_name = "Ensemble Sampler using Walk Move";
         this->initialize_ensemble();
       } 

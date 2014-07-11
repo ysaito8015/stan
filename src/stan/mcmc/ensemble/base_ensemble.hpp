@@ -4,10 +4,13 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <string>
+#include <sstream>
 
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/prob/distributions/univariate/continuous/normal.hpp>
 #include <stan/prob/distributions/univariate/continuous/uniform.hpp>
+#include <stan/io/dump.hpp>
 
 namespace stan {
   
@@ -20,17 +23,19 @@ namespace stan {
       
     public:
       
-      base_ensemble(M& m, BaseRNG& rng, std::ostream* o, std::ostream* e)
+      base_ensemble(M& m, BaseRNG& rng, stan::io::var_context& context, 
+                    std::ostream* o, std::ostream* e)
         : base_mcmc(o,e), 
           _model(m),
           _params_mean(m.num_params_r()),
-          _current_states(50*m.num_params_r()+1),
-          _new_states(50*m.num_params_r()+1),
-          _logp(50*m.num_params_r()+1),
-          _accept_prob(50*m.num_params_r()+1),
+          _current_states(30*m.num_params_r()+1),
+          _new_states(30*m.num_params_r()+1),
+          _logp(30*m.num_params_r()+1),
+          _accept_prob(30*m.num_params_r()+1),
           _rand_int(rng),
           _rand_uniform(_rand_int),
-          _scale(2.0) {};  
+          _scale(2.0),
+          _context(context) {};  
  
       ~base_ensemble() {};
 
@@ -113,11 +118,16 @@ namespace stan {
 
         ensemble_transition(_current_states, _new_states, _logp, _accept_prob);
 
-        for (int j = 0; j < _params_mean.size(); j++) {
-          for (int i = 0; i < _current_states.size(); i++)
-            _params_mean(j) += _new_states[i](j) / _current_states.size();      
+        for (int i = 0; i < _current_states.size(); i++) {
+          Eigen::VectorXd temp_values;
+          _model.template write_array(_rand_int, _new_states[i], temp_values);
+          for (int j = 0; j < _params_mean.size(); j++) {
+            _params_mean(j) += temp_values(j) / _current_states.size();   
+          }
         }
 
+        _model.template transform_inits(_context,_params_mean);
+        
         _current_states = _new_states;
 
         return sample(_params_mean, _logp.mean(), _accept_prob.mean());
@@ -133,10 +143,14 @@ namespace stan {
         }
         
         _params_mean.setZero();
-        for (int j = 0; j < _params_mean.size(); j++) {
-          for (int i = 0; i < _current_states.size(); i++)
-            _params_mean(j) += _current_states[i](j) / _current_states.size();
+        for (int i = 0; i < _current_states.size(); i++) {
+          Eigen::VectorXd temp_values;
+          _model.template write_array(_rand_int, _new_states[i], temp_values);
+          for (int j = 0; j < _params_mean.size(); j++) {
+            _params_mean(j) += temp_values(j) / _current_states.size();   
+          }
         }
+        _model.template transform_inits(_context,_params_mean);
       }
 
 
@@ -154,6 +168,8 @@ namespace stan {
       boost::uniform_01<BaseRNG&> _rand_uniform;                
 
       double _scale;
+
+      stan::io::var_context& _context;
 
       void _write_error_msg(std::ostream* error_msgs,
                            const std::domain_error& e) {
