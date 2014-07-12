@@ -80,7 +80,7 @@ TEST(McmcEnsembleStretchMoveEnsemble, construction_chi_square_goodness_of_fit) {
   int N = 10000;
   int K = boost::math::round(2 * std::pow(N, 0.4));
   boost::math::chi_squared mydist(K-1);
-  boost::math::uniform_distribution<>dist (-0.5,0.5);
+  boost::math::uniform_distribution<>dist (-2,2);
 
   double loc[K - 1];
   for(int i = 1; i < K; i++)
@@ -122,12 +122,7 @@ TEST(McmcEnsembleStretchMoveEnsemble, transition) {
   stan::mcmc::sample s0(a,-1,0.3);
   std::vector<Eigen::VectorXd> init_states = sampler.get_current_states();
 
-  stan::mcmc::sample s_new = sampler.transition(s0);
-  std::vector<Eigen::VectorXd> new_states = sampler.get_current_states();
-  for (int i = 0; i < 5; i++) {
-    for (int j = 0; j < 2; j++) 
-      std::cout<<"Before: "<<init_states[i](j)<<"  New:  " << new_states[i](j)<<std::endl;
-  }
+  EXPECT_NO_THROW(sampler.transition(s0));
 }
 
 TEST(McmcEnsembleStretchMoveEnsemble, write_metric) {

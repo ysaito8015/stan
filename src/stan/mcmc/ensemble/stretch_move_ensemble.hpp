@@ -21,10 +21,9 @@ namespace stan {
     public:
       
       stretch_move_ensemble(M& m, BaseRNG& rng,
-                            stan::io::var_context& context,
                             std::ostream* o = &std::cout, 
                             std::ostream* e = 0)
-        : base_ensemble<M,BaseRNG>(m,rng,context,o,e) {
+        : base_ensemble<M,BaseRNG>(m,rng,o,e) {
         this->_name = "Ensemble Sampler using Stretch Move";
         this->initialize_ensemble();
       } 

@@ -616,7 +616,7 @@ namespace stan {
         } else if (algo->value() == "stretch_ensemble") {
 
           typedef stan::mcmc::stretch_move_ensemble<Model, rng_t> sampler;
-          sampler_ptr = new sampler(model, base_rng, init_var_context, &std::cout, &std::cout);
+          sampler_ptr = new sampler(model, base_rng, &std::cout, &std::cout);
           
           adapt_engaged = false;
 
@@ -625,7 +625,7 @@ namespace stan {
         } else if (algo->value() == "walk_ensemble") {
 
           typedef stan::mcmc::walk_move_ensemble<Model, rng_t> sampler;
-          sampler_ptr = new sampler(model, base_rng, init_var_context, &std::cout, &std::cout);
+          sampler_ptr = new sampler(model, base_rng, &std::cout, &std::cout);
           
           adapt_engaged = false;
 

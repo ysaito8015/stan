@@ -236,7 +236,7 @@ TEST(McmcEnsembleBaseEnsemble, initialize_chi_square_goodness_of_fit) {
   int N = 10000;
   int K = boost::math::round(2 * std::pow(N, 0.4));
   boost::math::chi_squared mydist(K-1);
-  boost::math::uniform_distribution<>dist (-0.5,0.5);
+  boost::math::uniform_distribution<>dist (-2,2);
 
   double loc[K - 1];
   for(int i = 1; i < K; i++)
@@ -293,5 +293,4 @@ TEST(McmcEnsembleBaseEnsemble, transition) {
       EXPECT_FLOAT_EQ(initial_param_mean(j)+1, sampler.get_params_mean()(j));
     }
   }
-
 }

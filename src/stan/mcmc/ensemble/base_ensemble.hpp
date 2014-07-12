@@ -10,7 +10,7 @@
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/prob/distributions/univariate/continuous/normal.hpp>
 #include <stan/prob/distributions/univariate/continuous/uniform.hpp>
-#include <stan/io/dump.hpp>
+#include <stan/io/var_context_builder.hpp>
 
 namespace stan {
   
@@ -23,19 +23,18 @@ namespace stan {
       
     public:
       
-      base_ensemble(M& m, BaseRNG& rng, stan::io::var_context& context, 
+      base_ensemble(M& m, BaseRNG& rng,
                     std::ostream* o, std::ostream* e)
         : base_mcmc(o,e), 
           _model(m),
           _params_mean(m.num_params_r()),
-          _current_states(30*m.num_params_r()+1),
-          _new_states(30*m.num_params_r()+1),
-          _logp(30*m.num_params_r()+1),
-          _accept_prob(30*m.num_params_r()+1),
+          _current_states(2*m.num_params_r()+1),
+          _new_states(2*m.num_params_r()+1),
+          _logp(2*m.num_params_r()+1),
+          _accept_prob(2*m.num_params_r()+1),
           _rand_int(rng),
           _rand_uniform(_rand_int),
-          _scale(2.0),
-          _context(context) {};  
+          _scale(2.0) {};  
  
       ~base_ensemble() {};
 
@@ -98,6 +97,39 @@ namespace stan {
                    + 1, 2) / _scale;
       }
 
+      Eigen::VectorXd unconstrain_params(Eigen::VectorXd& params) {
+        std::vector<std::string> names;
+        std::vector<std::vector<size_t> > dims;
+        _model.template get_param_names(names);
+        _model.template get_dims(dims);
+
+        std::map<std::string, std::pair<std::vector<double>, std::vector<size_t> > > vars_r;
+        std::map<std::string, std::pair<std::vector<int>, std::vector<size_t> > > vars_i;
+
+        int total_count = 0;
+
+        for (int i = 0; i < names.size(); i++) {
+          int count = 1;
+          if (dims[i].size() > 0) {
+            for (int j = 0; j < dims[i].size(); j++)
+              count *= dims[i][j];
+          }
+          std::vector<double> temp;
+          temp.resize(0);
+          for (int j = total_count; j < total_count+count; j++)
+            temp.push_back(params(j));
+          vars_r[names[i]] = std::pair<std::vector<double>, 
+                                       std::vector<size_t> >(temp, dims[i]);
+          
+          total_count += count;
+        }
+              
+        stan::io::var_context_builder _var_context(vars_r, vars_i);
+        _model.template transform_inits(_var_context, params);
+
+        return params;
+      }
+
       double log_prob(Eigen::VectorXd& q) {
         try {
           _model.template log_prob<false,true>(q, this->_err_stream);
@@ -126,8 +158,7 @@ namespace stan {
           }
         }
 
-        _model.template transform_inits(_context,_params_mean);
-        
+        _params_mean = unconstrain_params(_params_mean);
         _current_states = _new_states;
 
         return sample(_params_mean, _logp.mean(), _accept_prob.mean());
@@ -141,16 +172,18 @@ namespace stan {
             _current_states[i](j) = stan::prob::uniform_rng(-2.0,2.0,_rand_int);
           }
         }
-        
+
         _params_mean.setZero();
         for (int i = 0; i < _current_states.size(); i++) {
           Eigen::VectorXd temp_values;
-          _model.template write_array(_rand_int, _new_states[i], temp_values);
+          temp_values.setZero();
+          _model.template write_array(_rand_int, _current_states[i], temp_values);
           for (int j = 0; j < _params_mean.size(); j++) {
             _params_mean(j) += temp_values(j) / _current_states.size();   
           }
         }
-        _model.template transform_inits(_context,_params_mean);
+
+        _params_mean = unconstrain_params(_params_mean);
       }
 
 
@@ -168,8 +201,6 @@ namespace stan {
       boost::uniform_01<BaseRNG&> _rand_uniform;                
 
       double _scale;
-
-      stan::io::var_context& _context;
 
       void _write_error_msg(std::ostream* error_msgs,
                            const std::domain_error& e) {
