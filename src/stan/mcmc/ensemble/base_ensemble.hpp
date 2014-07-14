@@ -34,7 +34,9 @@ namespace stan {
           _accept_prob(2*m.num_params_r()+1),
           _rand_int(rng),
           _rand_uniform(_rand_int),
-          _scale(2.0) {};  
+          _scale(2.0),
+          _names(m.num_params_r()),
+          _dims(m.num_params_r()) {};  
  
       ~base_ensemble() {};
 
@@ -97,11 +99,9 @@ namespace stan {
                    + 1, 2) / _scale;
       }
 
-      Eigen::VectorXd unconstrain_params(Eigen::VectorXd& params) {
-        std::vector<std::string> names;
-        std::vector<std::vector<size_t> > dims;
-        _model.template get_param_names(names);
-        _model.template get_dims(dims);
+      Eigen::VectorXd unconstrain_params(std::vector<std::string>& names,
+                                         std::vector<std::vector<size_t> >& dims,
+                                         Eigen::VectorXd& params) {
 
         std::map<std::string, std::pair<std::vector<double>, std::vector<size_t> > > vars_r;
         std::map<std::string, std::pair<std::vector<int>, std::vector<size_t> > > vars_i;
@@ -158,7 +158,7 @@ namespace stan {
           }
         }
 
-        _params_mean = unconstrain_params(_params_mean);
+        _params_mean = unconstrain_params(_names, _dims, _params_mean);
         _current_states = _new_states;
 
         return sample(_params_mean, _logp.mean(), _accept_prob.mean());
@@ -183,7 +183,10 @@ namespace stan {
           }
         }
 
-        _params_mean = unconstrain_params(_params_mean);
+        _model.template get_param_names(_names);
+        _model.template get_dims(_dims);
+
+        _params_mean = unconstrain_params(_names, _dims, _params_mean);
       }
 
 
@@ -201,6 +204,9 @@ namespace stan {
       boost::uniform_01<BaseRNG&> _rand_uniform;                
 
       double _scale;
+
+      std::vector<std::string> _names;
+      std::vector<std::vector<size_t> > _dims;
 
       void _write_error_msg(std::ostream* error_msgs,
                            const std::domain_error& e) {
