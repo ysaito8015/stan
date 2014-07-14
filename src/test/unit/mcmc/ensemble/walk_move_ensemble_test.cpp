@@ -3,7 +3,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/math/distributions.hpp>
-#include <test/test-models/no-main/optimization/rosenbrock.cpp>
+#include <test/test-models/no-main/mcmc/ensemble/rosenbrock.cpp>
 #include <gtest/gtest.h>
 
 typedef boost::ecuyer1988 rng_t;

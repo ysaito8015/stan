@@ -3,7 +3,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/math/distributions.hpp>
-#include <test/test-models/no-main/optimization/rosenbrock.cpp>
+#include <test/test-models/no-main/mcmc/ensemble/rosenbrock.cpp>
 #include <gtest/gtest.h>
 
 typedef boost::ecuyer1988 rng_t;
@@ -293,4 +293,11 @@ TEST(McmcEnsembleBaseEnsemble, transition) {
       EXPECT_FLOAT_EQ(initial_param_mean(j)+1, sampler.get_params_mean()(j));
     }
   }
+}
+
+TEST(McmcEnsembleBaseEnsemble, unconstrain_params) {
+  Eigen::VectorXd a(2);
+  a << 1, -1;
+  sampler.initialize_ensemble();
+  EXPECT_NO_THROW(sampler.unconstrain_params(a));
 }

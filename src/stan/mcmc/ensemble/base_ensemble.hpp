@@ -99,31 +99,29 @@ namespace stan {
                    + 1, 2) / _scale;
       }
 
-      Eigen::VectorXd unconstrain_params(std::vector<std::string>& names,
-                                         std::vector<std::vector<size_t> >& dims,
-                                         Eigen::VectorXd& params) {
+      Eigen::VectorXd unconstrain_params(Eigen::VectorXd& params) {
 
         std::map<std::string, std::pair<std::vector<double>, std::vector<size_t> > > vars_r;
         std::map<std::string, std::pair<std::vector<int>, std::vector<size_t> > > vars_i;
 
         int total_count = 0;
 
-        for (int i = 0; i < names.size(); i++) {
+        for (int i = 0; i < _names.size(); i++) {
           int count = 1;
-          if (dims[i].size() > 0) {
-            for (int j = 0; j < dims[i].size(); j++)
-              count *= dims[i][j];
+          if (_dims[i].size() > 0) {
+            for (int j = 0; j < _dims[i].size(); j++)
+              count *= _dims[i][j];
           }
           std::vector<double> temp;
           temp.resize(0);
           for (int j = total_count; j < total_count+count; j++)
             temp.push_back(params(j));
-          vars_r[names[i]] = std::pair<std::vector<double>, 
-                                       std::vector<size_t> >(temp, dims[i]);
+          vars_r[_names[i]] = std::pair<std::vector<double>, 
+                                       std::vector<size_t> >(temp, _dims[i]);
           
           total_count += count;
         }
-              
+
         stan::io::var_context_builder _var_context(vars_r, vars_i);
         _model.template transform_inits(_var_context, params);
 
@@ -158,7 +156,7 @@ namespace stan {
           }
         }
 
-        _params_mean = unconstrain_params(_names, _dims, _params_mean);
+        _params_mean = unconstrain_params(_params_mean);
         _current_states = _new_states;
 
         return sample(_params_mean, _logp.mean(), _accept_prob.mean());
@@ -186,7 +184,7 @@ namespace stan {
         _model.template get_param_names(_names);
         _model.template get_dims(_dims);
 
-        _params_mean = unconstrain_params(_names, _dims, _params_mean);
+        _params_mean = unconstrain_params(_params_mean);
       }
 
 

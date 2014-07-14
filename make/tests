@@ -197,8 +197,11 @@ test/unit/gm/generator.o: src/test/test-models/no-main/gm/test_lp.cpp
 
 test/unit/model/util.o: src/test/test-models/no-main/model/valid.cpp src/test/test-models/no-main/model/domain_fail.cpp
 
-test/unit/mcmc/ensemble/base_ensemble.o: src/test/test-models/no-main/optimization/rosenbrock.cpp
-test/unit/mcmc/ensemble/stretch_move_ensemble.o: src/test/test-models/no-main/optimization/rosenbrock.cpp
+test/unit/mcmc/ensemble/base_ensemble.o: src/test/test-models/no-main/mcmc/ensemble/rosenbrock.cpp
+test/unit/mcmc/ensemble/base_ensemble2.o: src/test/test-models/no-main/mcmc/ensemble/funnel.cpp
+test/unit/mcmc/ensemble/base_ensemble3.o: src/test/test-models/no-main/mcmc/ensemble/bernoulli.cpp
+test/unit/mcmc/ensemble/stretch_move_ensemble.o: src/test/test-models/no-main/mcmc/ensemble/rosenbrock.cpp
+test/unit/mcmc/ensemble/walk_move_ensemble.o: src/test/test-models/no-main/mcmc/ensemble/rosenbrock.cpp
 
 test/unit/mcmc/hmc/hamiltonians/base_hamiltonian.o: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
 test/unit/mcmc/hmc/hamiltonians/unit_e_metric.o: src/test/test-models/no-main/mcmc/hmc/hamiltonians/funnel.cpp
