@@ -25,7 +25,7 @@ namespace stan {
                          std::ostream* o = &std::cout, 
                          std::ostream* e = 0)
         : base_ensemble<M,BaseRNG>(m,rng,o,e) {
-        this->_name = "Ensemble Sampler using Walk Move";
+        this->name_ = "Ensemble Sampler using Walk Move";
         this->initialize_ensemble();
       } 
 
@@ -37,7 +37,7 @@ namespace stan {
         while (walkers.size() <= 1) {
           walkers.resize(0);
           for (int i = 0; i < num_walkers - 1; i++) {
-            int temp = stan::prob::bernoulli_rng(0.5,this->_rand_int);
+            int temp = stan::prob::bernoulli_rng(0.5,this->rand_int_);
             if (temp) {
               if (i >= index)
                 walkers.push_back(i+2);
@@ -82,7 +82,7 @@ namespace stan {
           //proposes new walker position
           new_states[i] = cur_states[i];
           for (int j = 0; j < rand_walkers.size(); j++)
-            new_states[i] += stan::prob::normal_rng(0.0, 1.0, this->_rand_int)
+            new_states[i] += stan::prob::normal_rng(0.0, 1.0, this->rand_int_)
               * (cur_states[rand_walkers[j]-1] - mean_rand_walkers);
 
           //calculate new log prob
@@ -96,7 +96,7 @@ namespace stan {
 
           accept_prob(i) = accept_prob(i) > 1 ? 1 : accept_prob(i);
 
-          if (this->_rand_uniform() > accept_prob(i)) {
+          if (this->rand_uniform_() > accept_prob(i)) {
             new_states[i] = cur_states[i];
             logp(i) = logp0;
           }
