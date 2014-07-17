@@ -581,16 +581,12 @@ namespace stan {
           
           adapt_engaged = false;
 
-          num_warmup = 0;
-
         } else if (algo->value() == "walk_ensemble") {
 
           typedef stan::mcmc::walk_move_ensemble<Model, rng_t> sampler;
           sampler_ptr = new sampler(model, base_rng, &std::cout, &std::cout);
           
           adapt_engaged = false;
-
-          num_warmup = 0;
 
         } else if (algo->value() == "hmc") {
           
