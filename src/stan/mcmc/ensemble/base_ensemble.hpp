@@ -4,10 +4,13 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <string>
+#include <sstream>
 
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/prob/distributions/univariate/continuous/normal.hpp>
 #include <stan/prob/distributions/univariate/continuous/uniform.hpp>
+#include <stan/io/var_context_builder.hpp>
 
 namespace stan {
   
@@ -20,17 +23,20 @@ namespace stan {
       
     public:
       
-      base_ensemble(M& m, BaseRNG& rng, std::ostream* o, std::ostream* e)
+      base_ensemble(M& m, BaseRNG& rng,
+                    std::ostream* o, std::ostream* e)
         : base_mcmc(o,e), 
-          _model(m),
-          _params_mean(m.num_params_r()),
-          _current_states(2*m.num_params_r()+1),
-          _new_states(2*m.num_params_r()+1),
-          _logp(2*m.num_params_r()+1),
-          _accept_prob(2*m.num_params_r()+1),
-          _rand_int(rng),
-          _rand_uniform(_rand_int),
-          _scale(2.0) {};  
+          model_(m),
+          params_mean_(m.num_params_r()),
+          current_states_(2*m.num_params_r()+1),
+          new_states_(2*m.num_params_r()+1),
+          logp_(2*m.num_params_r()+1),
+          accept_prob_(2*m.num_params_r()+1),
+          rand_int_(rng),
+          rand_uniform_(rand_int_),
+          scale_(2.0),
+          names_(m.num_params_r()),
+          dims_(m.num_params_r()) {};  
  
       ~base_ensemble() {};
 
@@ -56,13 +62,13 @@ namespace stan {
       }
 
       void get_params(std::vector<double>& values) {
-        for(size_t i = 0; i < _params_mean.size(); ++i)
-          values.push_back(_params_mean(i));
+        for(size_t i = 0; i < params_mean_.size(); ++i)
+          values.push_back(params_mean_(i));
        }
       
       void get_param_names(std::vector<std::string>& model_names,
                            std::vector<std::string>& names) {
-        for(size_t i = 0; i < _params_mean.size(); ++i)
+        for(size_t i = 0; i < params_mean_.size(); ++i)
           names.push_back(model_names[i]);
        }
 
@@ -71,7 +77,7 @@ namespace stan {
       }
       
       void write_sampler_params(std::ostream& o) {
-        o << this->_scale << ",";
+        o << this->scale_ << ",";
       }
       
       void get_sampler_param_names(std::vector<std::string>& names) {
@@ -79,83 +85,128 @@ namespace stan {
       }
       
       void get_sampler_params(std::vector<double>& values) {
-        values.push_back(this->_scale);
+        values.push_back(this->scale_);
       }
       
       void set_scale(const double e) {
-        if(e > 0) _scale = e;
+        if(e > 0) scale_ = e;
       }
       
-      double get_scale() { return this->_scale; }
+      double get_scale() { return this->scale_; }
       
       double sample_z() {
-        return pow(stan::prob::uniform_rng(0.0, 1.0, _rand_int) * (_scale - 1.0)
-                   + 1, 2) / _scale;
+        return pow(stan::prob::uniform_rng(0.0, 1.0, rand_int_) * (scale_ - 1.0)
+                   + 1, 2) / scale_;
+      }
+
+      Eigen::VectorXd unconstrain_params(Eigen::VectorXd& params) {
+
+        std::map<std::string, std::pair<std::vector<double>, std::vector<size_t> > > vars_r;
+        std::map<std::string, std::pair<std::vector<int>, std::vector<size_t> > > vars_i;
+
+        int total_count = 0;
+
+        for (int i = 0; i < names_.size(); i++) {
+          int count = 1;
+          if (dims_[i].size() > 0) {
+            for (int j = 0; j < dims_[i].size(); j++)
+              count *= dims_[i][j];
+          }
+          std::vector<double> temp;
+          temp.resize(0);
+          for (int j = total_count; j < total_count+count; j++)
+            temp.push_back(params(j));
+          vars_r[names_[i]] = std::pair<std::vector<double>, 
+                                       std::vector<size_t> >(temp, dims_[i]);
+          
+          total_count += count;
+        }
+
+        stan::io::var_context_builder vars_context(vars_r, vars_i);
+        model_.template transform_inits(vars_context, params);
+
+        return params;
       }
 
       double log_prob(Eigen::VectorXd& q) {
         try {
-          _model.template log_prob<false,false>(q, this->_err_stream);
+          model_.template log_prob<false,true>(q, this->err_stream_);
         } catch (std::domain_error e) {
-          this->_write_error_msg(this->_err_stream, e);
+          this->write_error_msg_(this->err_stream_, e);
           return std::numeric_limits<double>::infinity();
         }
-        return _model.template log_prob<false,false>(q, this->_err_stream);
+        return model_.template log_prob<false,true>(q, this->err_stream_);
       }
 
       sample transition(sample& init_sample) {
-        _params_mean.setZero();
-        _logp.setZero();
-        _accept_prob.setZero();
+        params_mean_.setZero();
+        logp_.setZero();
+        accept_prob_.setZero();
 
-        for (int i = 0; i < _new_states.size(); i++) 
-          _new_states[i].setZero();
+        for (int i = 0; i < new_states_.size(); i++) 
+          new_states_[i].setZero();
 
-        ensemble_transition(_current_states, _new_states, _logp, _accept_prob);
+        ensemble_transition(current_states_, new_states_, logp_, accept_prob_);
 
-        for (int j = 0; j < _params_mean.size(); j++) {
-          for (int i = 0; i < _current_states.size(); i++)
-            _params_mean(j) += _new_states[i](j) / _current_states.size();
+        for (int i = 0; i < current_states_.size(); i++) {
+          Eigen::VectorXd temp_values;
+          model_.template write_array(rand_int_, new_states_[i], temp_values);
+          for (int j = 0; j < params_mean_.size(); j++) {
+            params_mean_(j) += temp_values(j) / current_states_.size();   
+          }
         }
 
-        _current_states = _new_states;
+        params_mean_ = unconstrain_params(params_mean_);
+        current_states_ = new_states_;
 
-        return sample(_params_mean, _logp.mean(), _accept_prob.mean());
+        return sample(params_mean_, logp_.mean(), accept_prob_.mean());
       }
 
       void initialize_ensemble() {
-        for (int i = 0; i < _current_states.size(); i++) {
-          _current_states[i].resize(_params_mean.size());
-          _new_states[i].resize(_params_mean.size());
-          for (int j = 0; j < _current_states[i].size(); j++) {
-            _current_states[i](j) = _rand_uniform() - 0.5;
+        for (int i = 0; i < current_states_.size(); i++) {
+          current_states_[i].resize(params_mean_.size());
+          new_states_[i].resize(params_mean_.size());
+          for (int j = 0; j < current_states_[i].size(); j++) {
+            current_states_[i](j) = stan::prob::uniform_rng(-2.0,2.0,rand_int_);
           }
         }
-        
-        _params_mean.setZero();
-        for (int j = 0; j < _params_mean.size(); j++) {
-          for (int i = 0; i < _current_states.size(); i++)
-            _params_mean(j) += _current_states[i](j) / _current_states.size();
-        }     
+
+        params_mean_.setZero();
+        for (int i = 0; i < current_states_.size(); i++) {
+          Eigen::VectorXd temp_values;
+          temp_values.setZero();
+          model_.template write_array(rand_int_, current_states_[i], temp_values);
+          for (int j = 0; j < params_mean_.size(); j++) {
+            params_mean_(j) += temp_values(j) / current_states_.size();   
+          }
+        }
+
+        model_.template get_param_names(names_);
+        model_.template get_dims(dims_);
+
+        params_mean_ = unconstrain_params(params_mean_);
       }
 
 
     protected:
-      M _model;
+      M model_;
 
-      Eigen::VectorXd _params_mean;
-      std::vector<Eigen::VectorXd> _current_states;
-      std::vector<Eigen::VectorXd> _new_states;
+      Eigen::VectorXd params_mean_;
+      std::vector<Eigen::VectorXd> current_states_;
+      std::vector<Eigen::VectorXd> new_states_;
 
-      Eigen::VectorXd _logp;
-      Eigen::VectorXd _accept_prob;
+      Eigen::VectorXd logp_;
+      Eigen::VectorXd accept_prob_;
 
-      BaseRNG& _rand_int;
-      boost::uniform_01<BaseRNG&> _rand_uniform;                
+      BaseRNG& rand_int_;
+      boost::uniform_01<BaseRNG&> rand_uniform_;                
 
-      double _scale;
+      double scale_;
 
-      void _write_error_msg(std::ostream* error_msgs,
+      std::vector<std::string> names_;
+      std::vector<std::vector<size_t> > dims_;
+
+      void write_error_msg_(std::ostream* error_msgs,
                            const std::domain_error& e) {
           if (!error_msgs) return;
           

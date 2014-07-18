@@ -3,7 +3,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/math/distributions.hpp>
-#include <test/test-models/no-main/optimization/rosenbrock.cpp>
+#include <test/test-models/no-main/mcmc/ensemble/rosenbrock.cpp>
 #include <gtest/gtest.h>
 
 typedef boost::ecuyer1988 rng_t;
@@ -37,21 +37,21 @@ namespace stan {
         }
       }
 
-      int get_params_size() {return this->_params_mean.size();}
-      int get_current_states_size() {return this->_current_states.size();}
-      int get_new_states_size() {return this->_new_states.size();}
-      int get_logp_size() {return this->_logp.size();}
-      int get_accept_prob_size() {return this->_accept_prob.size();}
-      double get_scale_init() {return this->_scale;}
+      int get_params_size() {return this->params_mean_.size();}
+      int get_current_states_size() {return this->current_states_.size();}
+      int get_new_states_size() {return this->new_states_.size();}
+      int get_logp_size() {return this->logp_.size();}
+      int get_accept_prob_size() {return this->accept_prob_.size();}
+      double get_scale_init() {return this->scale_;}
       
-      Eigen::VectorXd get_params_mean() {return this->_params_mean;}
-      Eigen::VectorXd get_accept_prob() {return this->_accept_prob;}
-      Eigen::VectorXd get_logp() {return this->_logp;}
+      Eigen::VectorXd get_params_mean() {return this->params_mean_;}
+      Eigen::VectorXd get_accept_prob() {return this->accept_prob_;}
+      Eigen::VectorXd get_logp() {return this->logp_;}
       std::vector<Eigen::VectorXd> get_current_states() {
-        return this->_current_states;
+        return this->current_states_;
       }
       std::vector<Eigen::VectorXd> get_new_states() {
-        return this->_new_states;
+        return this->new_states_;
       }
     };
     
@@ -236,7 +236,7 @@ TEST(McmcEnsembleBaseEnsemble, initialize_chi_square_goodness_of_fit) {
   int N = 10000;
   int K = boost::math::round(2 * std::pow(N, 0.4));
   boost::math::chi_squared mydist(K-1);
-  boost::math::uniform_distribution<>dist (-0.5,0.5);
+  boost::math::uniform_distribution<>dist (-2,2);
 
   double loc[K - 1];
   for(int i = 1; i < K; i++)
@@ -293,5 +293,11 @@ TEST(McmcEnsembleBaseEnsemble, transition) {
       EXPECT_FLOAT_EQ(initial_param_mean(j)+1, sampler.get_params_mean()(j));
     }
   }
+}
 
+TEST(McmcEnsembleBaseEnsemble, unconstrain_params) {
+  Eigen::VectorXd a(2);
+  a << 1, -1;
+  sampler.initialize_ensemble();
+  EXPECT_NO_THROW(sampler.unconstrain_params(a));
 }
