@@ -28,6 +28,22 @@ def run_Stan_NUTS( model, datafile, num_runs ):
     # don't save warmup, number of warmups, samples
     print(command)
     run_Stan(command, model, "nuts", num_runs)
+        
+def run_Stan_Stretch_Ensemble( model, datafile, num_runs ):
+    print("run Stan Stretch Ensemble")
+    # setup stan command
+    command = model + " sample algorithm=stretch_ensemble data file=" + datafile
+    # don't save warmup, number of warmups, samples
+    print(command)
+    run_Stan(command, model, "stretch_ensemble", num_runs)
+            
+def run_Stan_Walk_Ensemble( model, datafile, num_runs ):
+    print("run Stan Walk Ensemble")
+    # setup stan command
+    command = model + " sample algorithm=walk_ensemble data file=" + datafile
+    # don't save warmup, number of warmups, samples
+    print(command)
+    run_Stan(command, model, "walk", num_runs)
     
 # run_Stan:  does N runs of cmdStan
 # collects run times and parameter stats from each run
@@ -60,6 +76,10 @@ def run_Stan ( stan_cmd, model, method, num_runs) :
 
         # grep output.csv for time info
         for line in open("output.csv",'r'):
+            if re.search("(Warmup)",line):
+                tokens = line.split()
+                times_fh.write(tokens[1])
+                times_fh.write("  ")
             if re.search("(Sampling)",line):
                 tokens = line.split()
                 times_fh.write(tokens[1])
@@ -119,8 +139,10 @@ def main():
 
     if method.lower().startswith("nuts"):
         run_Stan_NUTS(model, datafile, num_runs)
-    elif method.lower().startswith("ens"):
-        run_Stan_ensemble(model, datafile, num_runs)
+    elif method.lower().startswith("str"):
+        run_Stan_Stretch_Ensemble(model, datafile, num_runs)
+    elif method.lower().startswith("walk"):
+        run_Stan_Walk_Ensemble(model, datafile, num_runs)
     # run model using JAGS - 
     
     print('all processing completed ( %s)\n' % time.strftime('%x %X %Z'))
