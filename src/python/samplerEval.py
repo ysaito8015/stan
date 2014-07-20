@@ -48,13 +48,13 @@ def run_Stan_Walk_Ensemble( model, datafile, num_runs ):
 # run_Stan:  does N runs of cmdStan
 # collects run times and parameter stats from each run
 # optionally saves sampler output
+@profile
 def run_Stan ( stan_cmd, model, method, num_runs) :
     saveOutputCsv = False
     modelpath = model.split('/')
     modelname = modelpath[len(modelpath)-1]
     params_filename = "stats_param_" + modelname + "_" + method + ".txt"
     params_fh = open(params_filename,'w')
-
     times_filename = "stats_time_" + modelname + "_" + method + ".txt"
     times_fh = open(times_filename,'w')
 
@@ -102,16 +102,17 @@ def run_Stan ( stan_cmd, model, method, num_runs) :
 
 # munge_binprint:  scrapes model param stats from bin/print output
 def munge_binprint( output, fh ):
-    header = "Mean     MCSE   StdDev     5%   50%   95%  N_Eff  N_Eff/s    R_hat"
-    sampler_stats = "lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,n_divergent__,scale__".split(',')
+    header = "Mean"
+    sampler_stats = "lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,n_divergent__".split(',')
     skip = True
     lines = output.decode().split('\n')
+    
     for line in lines:
+        tokens = line.split()
         if skip:
-            if header in line:
+            if len(tokens) > 0 and tokens[0] in header:
                 skip = False
         else:
-            tokens = line.split()
             if len(tokens) > 0 and not (tokens[0] in sampler_stats):
                 fh.write(line)
                 fh.write('\n')
