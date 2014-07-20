@@ -22,8 +22,6 @@
 #include <stan/gm/arguments/arg_random.hpp>
 #include <stan/gm/arguments/arg_output.hpp>
 
-#include <stan/mcmc/ensemble/stretch_move_ensemble.hpp>
-#include <stan/mcmc/ensemble/walk_move_ensemble.hpp>
 #include <stan/mcmc/fixed_param_sampler.hpp>
 #include <stan/mcmc/hmc/static/adapt_unit_e_static_hmc.hpp>
 #include <stan/mcmc/hmc/static/adapt_diag_e_static_hmc.hpp>
@@ -574,7 +572,7 @@ namespace stan {
           std::cout << algo->arg("rwm")->description() << std::endl;
           return 0;
         
-        } else if (algo->value() == "stretch_ensemble") {
+          /*        } else if (algo->value() == "stretch_ensemble") {
 
           typedef stan::mcmc::stretch_move_ensemble<Model, rng_t> sampler;
           sampler_ptr = new sampler(model, base_rng, &std::cout, &std::cout);
@@ -587,7 +585,7 @@ namespace stan {
           sampler_ptr = new sampler(model, base_rng, &std::cout, &std::cout);
           
           adapt_engaged = false;
-
+          */
         } else if (algo->value() == "hmc") {
           
           int engine_index = 0;
