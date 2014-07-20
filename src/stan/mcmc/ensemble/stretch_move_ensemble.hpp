@@ -24,7 +24,7 @@ namespace stan {
                             std::ostream* o = &std::cout, 
                             std::ostream* e = 0)
         : base_ensemble<M,BaseRNG>(m,rng,o,e) {
-        this->name_ = "Ensemble Sampler using Stretch Move";
+        this->_name = "Ensemble Sampler using Stretch Move";
         this->initialize_ensemble();
       } 
 
