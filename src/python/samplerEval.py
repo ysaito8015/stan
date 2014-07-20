@@ -103,7 +103,7 @@ def run_Stan ( stan_cmd, model, method, num_runs) :
 # munge_binprint:  scrapes model param stats from bin/print output
 def munge_binprint( output, fh ):
     header = "Mean"
-    sampler_stats = "lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,n_divergent__".split(',')
+    sampler_stats = "lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,n_divergent__,scale__".split(',')
     skip = True
     lines = output.decode().split('\n')
     
