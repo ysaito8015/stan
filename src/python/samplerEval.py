@@ -65,13 +65,7 @@ def run_Stan ( stan_cmd, model, method, num_runs) :
         print(runname)
 
         p1 = subprocess.Popen(stan_cmd.split(),shell=False,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-        try:
-            stdout, stderr = p1.communicate(timeout=300)
-        except TimeoutExpired:
-            p1.kill()
-            stdout, stderr = p1.communicate()
-            print(stderr.decode())
-            stop_err("processing failure on run: " + str(i))
+        stdout, stderr = p1.communicate()
         print('ran sampler ( %s)\n' % time.strftime('%x %X %Z'))
 
         # grep output.csv for time info
@@ -89,13 +83,8 @@ def run_Stan ( stan_cmd, model, method, num_runs) :
             
         # run bin/print on output.csv
         p1 = subprocess.Popen(binprint_cmd.split(),shell=False,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-        try:
-            stdout, stderr = p1.communicate(timeout=60)
-            if (stdout != None):
-                munge_binprint(stdout,params_fh)
-        except TimeoutExpired:
-            p1.kill()
-            stop_err("processing failure on run: " + str(i))
+        stdout, stderr = p1.communicate()
+        munge_binprint(stdout,params_fh)
 
         if saveOutputCsv:
             gzname = runname + "_output.csv.gz"
