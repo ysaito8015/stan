@@ -71,10 +71,13 @@ def run_Stan ( stan_cmd, model, method, num_runs) :
 
         # grep output.csv for time info
         for line in open("output.csv",'r'):
-            if re.search("(Warmup)",line):
+            if re.search("(Warm-up)",line):
                 tokens = line.split()
-                times_fh.write(tokens[1])
+                times_fh.write(tokens[3])
                 times_fh.write("  ")
+                break
+            
+        for line in open("output.csv",'r'):
             if re.search("(Sampling)",line):
                 tokens = line.split()
                 times_fh.write(tokens[1])
