@@ -23,8 +23,8 @@
 #include <stan/gm/arguments/arg_output.hpp>
 
 #include <stan/mcmc/fixed_param_sampler.hpp>
-#include <stan/mcmc/ensemble/stretch_ensemble.hpp>
-#include <stan/mcmc/ensemble/walk_ensemble.hpp>
+#include <stan/mcmc/ensemble/stretch_move_ensemble.hpp>
+#include <stan/mcmc/ensemble/walk_move_ensemble.hpp>
 #include <stan/mcmc/hmc/static/adapt_unit_e_static_hmc.hpp>
 #include <stan/mcmc/hmc/static/adapt_diag_e_static_hmc.hpp>
 #include <stan/mcmc/hmc/static/adapt_dense_e_static_hmc.hpp>
