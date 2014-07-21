@@ -22,7 +22,6 @@ def run_JAGS():
     print("run JAGS")
     
 def run_Stan_NUTS( model, datafile, num_warmup, num_samples, num_runs ):
-    print("run Stan NUTS")
     # setup stan command
     command = model + " sample num_warmup=" + str(num_warmup) + " num_samples=" + str(num_samples) + " data file=" + datafile
     # don't save warmup, number of warmups, samples
@@ -30,7 +29,6 @@ def run_Stan_NUTS( model, datafile, num_warmup, num_samples, num_runs ):
     run_Stan(command, datafile, "nuts", num_runs)
         
 def run_Stan_Stretch_Ensemble( model, datafile, num_warmup, num_samples, num_runs ):
-    print("run Stan Stretch Ensemble")
     # setup stan command
     command = model + " sample algorithm=stretch_ensemble num_warmup=" + str(num_warmup) + " num_samples=" + str(num_samples) + " data file=" + datafile
     # don't save warmup, number of warmups, samples
@@ -38,7 +36,6 @@ def run_Stan_Stretch_Ensemble( model, datafile, num_warmup, num_samples, num_run
     run_Stan(command, datafile, "stretch_ensemble", num_runs)
             
 def run_Stan_Walk_Ensemble( model, datafile, num_warmup, num_samples, num_runs ):
-    print("run Stan Walk Ensemble")
     # setup stan command
     command = model + " sample algorithm=walk_ensemble num_warmup=" + str(num_warmup) + " num_samples=" + str(num_samples) + " data file=" + datafile
     # don't save warmup, number of warmups, samples
@@ -58,31 +55,53 @@ def run_Stan ( stan_cmd, datafile, method, num_runs) :
     params_fh = open(params_filename,'w')
     times_filename = "results/stats_time_" + modelname + "_" + method + ".txt"
     times_fh = open(times_filename,'w')
+    rams_filename = "results/stats_ram_" + modelname + "_" + method + ".txt"
+    rams_fh = open(rams_filename,'w')
 
-    binprint_cmd = "bin/print output.csv"
 
     for i in range(num_runs):
         runname = modelname + "_" + method + "_" + str(i+1)
-        print(runname)
+        print("\n" + runname)
 
-        p1 = subprocess.Popen(stan_cmd.split(),shell=False,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-        stdout, stderr = p1.communicate()
-        print('ran sampler ( %s)\n' % time.strftime('%x %X %Z'))
+        stan_cmd2 = "/usr/bin/time -l " + stan_cmd
+        binprint_cmd = "bin/print"
 
-        # grep output.csv for time info
-        for line in open("output.csv",'r'):
-            if re.search("(Warm-up)",line):
-                tokens = line.split()
-                times_fh.write(tokens[3])
-                times_fh.write("  ")
-                break
-            
-        for line in open("output.csv",'r'):
-            if re.search("(Sampling)",line):
-                tokens = line.split()
-                times_fh.write(tokens[1])
-                times_fh.write('\n')
-                break
+        chains = list()
+        chains_out = list()
+        chains_err = list()
+        for j in range(4):
+            outputfile = "output" + str(j) + ".csv"
+            binprint_cmd = ' '.join([binprint_cmd,outputfile])
+            stan_cmd3 = stan_cmd2 + " output file=" + outputfile
+            print('start chain %d ' % j + stan_cmd + ' ( %s)' % time.strftime('%x %X %Z'))
+            chains.append(subprocess.Popen(stan_cmd3,shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE))
+            chains_out.append("")
+            chains_err.append("")
+
+        for j in range(len(chains)):
+            chains_out[j], chains_err[j] = chains[j].communicate()
+            print('finish chain %d ' % j + stan_cmd + ' ( %s)' % time.strftime('%x %X %Z'))
+            # get max RAM from stdout
+            for line in chains_err[j].decode().split('\n'):
+                if re.search("maximum resident set size",line):
+                    tokens = line.split()
+                    rams_fh.write(tokens[0])
+                    rams_fh.write('\n')
+                    break;
+            # grep output.csv for time info
+            outputfile = "output" + str(j) + ".csv"
+            for line in open(outputfile,'r'):
+                if re.search("(Warm-up)",line):
+                    tokens = line.split()
+                    times_fh.write(tokens[3])
+                    times_fh.write("  ")
+                    break
+            for line in open(outputfile,'r'):
+                if re.search("(Sampling)",line):
+                    tokens = line.split()
+                    times_fh.write(tokens[1])
+                    break
+            times_fh.write('\n')
                 
             
         # run bin/print on output.csv
@@ -98,8 +117,8 @@ def run_Stan ( stan_cmd, datafile, method, num_runs) :
         
         
     params_fh.close()
+    rams_fh.close()
     times_fh.close()
-    print('processing completed ( %s)\n' % time.strftime('%x %X %Z'))
 
 # munge_binprint:  scrapes model param stats from bin/print output
 def munge_binprint( output, fh ):
@@ -125,10 +144,8 @@ def main():
         stop_err("usage: samplerEval <model> <datafile> <method> <num_warmup> <num_samples> <num_runs> ")
 
     model = sys.argv[1]
-    print("model" + model)
     datafile = sys.argv[2]
     method = sys.argv[3]
-    print("method" + method)
     num_warmup = int(sys.argv[4])
     num_samples = int(sys.argv[5])
     num_runs = int(sys.argv[6])
@@ -141,7 +158,7 @@ def main():
         run_Stan_Walk_Ensemble(model, datafile, num_warmup, num_samples, num_runs)
     # run model using JAGS - 
     
-    print('all processing completed ( %s)\n' % time.strftime('%x %X %Z'))
+    print('\nall processing completed ( %s)\n' % time.strftime('%x %X %Z'))
 
 if __name__ == "__main__":
     main()
