@@ -48,7 +48,6 @@ def run_Stan_Walk_Ensemble( model, datafile, num_runs ):
 # run_Stan:  does N runs of cmdStan
 # collects run times and parameter stats from each run
 # optionally saves sampler output
-@profile
 def run_Stan ( stan_cmd, datafile, method, num_runs) :
     saveOutputCsv = False
     datapath = datafile.split('/')
