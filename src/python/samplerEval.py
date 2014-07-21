@@ -27,7 +27,7 @@ def run_Stan_NUTS( model, datafile, num_runs ):
     command = model + " sample data file=" + datafile
     # don't save warmup, number of warmups, samples
     print(command)
-    run_Stan(command, model, "nuts", num_runs)
+    run_Stan(command, datafile, "nuts", num_runs)
         
 def run_Stan_Stretch_Ensemble( model, datafile, num_runs ):
     print("run Stan Stretch Ensemble")
@@ -35,7 +35,7 @@ def run_Stan_Stretch_Ensemble( model, datafile, num_runs ):
     command = model + " sample algorithm=stretch_ensemble data file=" + datafile
     # don't save warmup, number of warmups, samples
     print(command)
-    run_Stan(command, model, "stretch_ensemble", num_runs)
+    run_Stan(command, datafile, "stretch_ensemble", num_runs)
             
 def run_Stan_Walk_Ensemble( model, datafile, num_runs ):
     print("run Stan Walk Ensemble")
@@ -43,16 +43,16 @@ def run_Stan_Walk_Ensemble( model, datafile, num_runs ):
     command = model + " sample algorithm=walk_ensemble data file=" + datafile
     # don't save warmup, number of warmups, samples
     print(command)
-    run_Stan(command, model, "walk", num_runs)
+    run_Stan(command, datafile, "walk", num_runs)
     
 # run_Stan:  does N runs of cmdStan
 # collects run times and parameter stats from each run
 # optionally saves sampler output
 @profile
-def run_Stan ( stan_cmd, model, method, num_runs) :
+def run_Stan ( stan_cmd, datafile, method, num_runs) :
     saveOutputCsv = False
-    modelpath = model.split('/')
-    modelname = modelpath[len(modelpath)-1]
+    datafile = datafile.split('.')
+    modelname = datafile[1]
     params_filename = "stats_param_" + modelname + "_" + method + ".txt"
     params_fh = open(params_filename,'w')
     times_filename = "stats_time_" + modelname + "_" + method + ".txt"
