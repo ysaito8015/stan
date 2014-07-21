@@ -54,9 +54,9 @@ def run_Stan ( stan_cmd, datafile, method, num_runs) :
     datafilename = datapath[len(datapath)-1]
     datafilesplit = datafilename.split('.')
     modelname = datafilesplit[0]
-    params_filename = "stats_param_" + modelname + "_" + method + ".txt"
+    params_filename = "results/stats_param_" + modelname + "_" + method + ".txt"
     params_fh = open(params_filename,'w')
-    times_filename = "stats_time_" + modelname + "_" + method + ".txt"
+    times_filename = "results/stats_time_" + modelname + "_" + method + ".txt"
     times_fh = open(times_filename,'w')
 
     binprint_cmd = "bin/print output.csv"
