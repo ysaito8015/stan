@@ -51,8 +51,10 @@ def run_Stan_Walk_Ensemble( model, datafile, num_runs ):
 @profile
 def run_Stan ( stan_cmd, datafile, method, num_runs) :
     saveOutputCsv = False
-    datafile = datafile.split('.')
-    modelname = datafile[0]
+    datapath = datafile.split('/')
+    datafilename = datapath[len(datapath)-1]
+    datafilesplit = datafilename.split('.')
+    modelname = datafilesplit[0]
     params_filename = "stats_param_" + modelname + "_" + method + ".txt"
     params_fh = open(params_filename,'w')
     times_filename = "stats_time_" + modelname + "_" + method + ".txt"
