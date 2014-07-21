@@ -572,7 +572,7 @@ namespace stan {
           std::cout << algo->arg("rwm")->description() << std::endl;
           return 0;
         
-          /*        } else if (algo->value() == "stretch_ensemble") {
+        } else if (algo->value() == "stretch_ensemble") {
 
           typedef stan::mcmc::stretch_move_ensemble<Model, rng_t> sampler;
           sampler_ptr = new sampler(model, base_rng, &std::cout, &std::cout);
@@ -585,7 +585,7 @@ namespace stan {
           sampler_ptr = new sampler(model, base_rng, &std::cout, &std::cout);
           
           adapt_engaged = false;
-          */
+          
         } else if (algo->value() == "hmc") {
           
           int engine_index = 0;
