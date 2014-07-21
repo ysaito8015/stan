@@ -21,29 +21,29 @@ def stop_err( msg ):
 def run_JAGS():
     print("run JAGS")
     
-def run_Stan_NUTS( model, datafile, num_runs ):
+def run_Stan_NUTS( model, datafile, num_warmup, num_samples, num_runs ):
     print("run Stan NUTS")
     # setup stan command
-    command = model + " sample data file=" + datafile
+    command = model + " sample num_warmup=" + str(num_warmup) + " num_samples=" + str(num_samples) + " data file=" + datafile
     # don't save warmup, number of warmups, samples
     print(command)
     run_Stan(command, datafile, "nuts", num_runs)
         
-def run_Stan_Stretch_Ensemble( model, datafile, num_runs ):
+def run_Stan_Stretch_Ensemble( model, datafile, num_warmup, num_samples, num_runs ):
     print("run Stan Stretch Ensemble")
     # setup stan command
-    command = model + " sample algorithm=stretch_ensemble data file=" + datafile
+    command = model + " sample algorithm=stretch_ensemble num_warmup=" + str(num_warmup) + " num_samples=" + str(num_samples) + " data file=" + datafile
     # don't save warmup, number of warmups, samples
     print(command)
     run_Stan(command, datafile, "stretch_ensemble", num_runs)
             
-def run_Stan_Walk_Ensemble( model, datafile, num_runs ):
+def run_Stan_Walk_Ensemble( model, datafile, num_warmup, num_samples, num_runs ):
     print("run Stan Walk Ensemble")
     # setup stan command
-    command = model + " sample algorithm=walk_ensemble data file=" + datafile
+    command = model + " sample algorithm=walk_ensemble num_warmup=" + str(num_warmup) + " num_samples=" + str(num_samples) + " data file=" + datafile
     # don't save warmup, number of warmups, samples
     print(command)
-    run_Stan(command, datafile, "walk", num_runs)
+    run_Stan(command, datafile, "walk_ensemble", num_runs)
     
 # run_Stan:  does N runs of cmdStan
 # collects run times and parameter stats from each run
@@ -121,22 +121,24 @@ def munge_binprint( output, fh ):
                 skip = True
 
 def main():
-    if (len(sys.argv) < 5):
-        stop_err("usage: samplerEval <model> <datafile> <method> <num_runs> ")
+    if (len(sys.argv) < 7):
+        stop_err("usage: samplerEval <model> <datafile> <method> <num_warmup> <num_samples> <num_runs> ")
 
     model = sys.argv[1]
     print("model" + model)
     datafile = sys.argv[2]
     method = sys.argv[3]
     print("method" + method)
-    num_runs = int(sys.argv[4])
+    num_warmup = int(sys.argv[4])
+    num_samples = int(sys.argv[5])
+    num_runs = int(sys.argv[6])
 
     if method.lower().startswith("nuts"):
-        run_Stan_NUTS(model, datafile, num_runs)
+        run_Stan_NUTS(model, datafile, num_warmup, num_samples, num_runs)
     elif method.lower().startswith("str"):
-        run_Stan_Stretch_Ensemble(model, datafile, num_runs)
+        run_Stan_Stretch_Ensemble(model, datafile, num_warmup, num_samples, num_runs)
     elif method.lower().startswith("walk"):
-        run_Stan_Walk_Ensemble(model, datafile, num_runs)
+        run_Stan_Walk_Ensemble(model, datafile, num_warmup, num_samples, num_runs)
     # run model using JAGS - 
     
     print('all processing completed ( %s)\n' % time.strftime('%x %X %Z'))
