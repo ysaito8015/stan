@@ -12,6 +12,7 @@ import time
 import shutil
 import gzip
 import re
+import random
 
 def stop_err( msg ):
     sys.stderr.write( '%s\n' % msg )
@@ -69,11 +70,12 @@ def run_Stan ( stan_cmd, datafile, method, num_runs) :
         chains = list()
         chains_out = list()
         chains_err = list()
+        seed = random.randint(1,10000)
         for j in range(4):
             outputfile = "output" + str(j) + ".csv"
             binprint_cmd = ' '.join([binprint_cmd,outputfile])
-            stan_cmd3 = stan_cmd2 + " output file=" + outputfile
-            print('start chain %d ' % j + stan_cmd + ' ( %s)' % time.strftime('%x %X %Z'))
+            stan_cmd3 = stan_cmd2 + " random seed=" + str(seed) + " id=" + str(j+1) + " output file=" + outputfile
+            print('start chain %d ' % j + stan_cmd3 + ' ( %s)' % time.strftime('%x %X %Z'))
             chains.append(subprocess.Popen(stan_cmd3,shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE))
             chains_out.append("")
             chains_err.append("")
@@ -86,22 +88,26 @@ def run_Stan ( stan_cmd, datafile, method, num_runs) :
                 if re.search("maximum resident set size",line):
                     tokens = line.split()
                     rams_fh.write(tokens[0])
-                    rams_fh.write('\n')
+                    rams_fh.write(' ')
                     break;
             # grep output.csv for time info
             outputfile = "output" + str(j) + ".csv"
             for line in open(outputfile,'r'):
                 if re.search("(Warm-up)",line):
                     tokens = line.split()
+                    times_fh.write(" ")
                     times_fh.write(tokens[3])
-                    times_fh.write("  ")
+                    times_fh.write(" ")
                     break
             for line in open(outputfile,'r'):
                 if re.search("(Sampling)",line):
                     tokens = line.split()
+                    times_fh.write(" ")
                     times_fh.write(tokens[1])
+                    times_fh.write(" ")
                     break
-            times_fh.write('\n')
+        rams_fh.write('\n')
+        times_fh.write('\n')
                 
             
         # run bin/print on output.csv
