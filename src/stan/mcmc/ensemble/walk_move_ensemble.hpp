@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__ENSEMBLE__WALK_MOVE_ENSEMBLE_HPP__
-#define __STAN__MCMC__ENSEMBLE__WALK_MOVE_ENSEMBLE_HPP__
+#ifndef STAN__MCMC__ENSEMBLE__WALK_MOVE_ENSEMBLE_HPP
+#define STAN__MCMC__ENSEMBLE__WALK_MOVE_ENSEMBLE_HPP
 
 #include <iostream>
 #include <vector>
@@ -25,7 +25,7 @@ namespace stan {
                          std::ostream* o = &std::cout, 
                          std::ostream* e = 0)
         : base_ensemble<M,BaseRNG>(m,rng,o,e) {
-        this->_name = "Ensemble Sampler using Walk Move";
+        this->name_ = "Ensemble Sampler using Walk Move";
         this->initialize_ensemble();
       } 
 

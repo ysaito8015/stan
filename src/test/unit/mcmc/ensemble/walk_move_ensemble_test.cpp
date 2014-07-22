@@ -21,7 +21,7 @@ namespace stan {
       mock_ensemble(Model& m, rng_t& rng, std::ostream* o, std::ostream* e) : 
         walk_move_ensemble<Model,rng_t>
         (m, rng, o, e)
-      { this->_name = "Mock Ensemble with Walk Move"; }
+      { this->name_ = "Mock Ensemble with Walk Move"; }
       
       int get_params_size() {return this->params_mean_.size();}
       int get_current_states_size() {return this->current_states_.size();}

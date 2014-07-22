@@ -21,7 +21,7 @@ namespace stan {
       mock_ensemble(Model& m, rng_t& rng, std::ostream* o, std::ostream* e) : 
         base_ensemble<Model,rng_t>
         (m, rng, o, e)
-      { this->_name = "Mock Ensemble"; }
+      { this->name_ = "Mock Ensemble"; }
       
       void write_metric(std::ostream* o) {}
 

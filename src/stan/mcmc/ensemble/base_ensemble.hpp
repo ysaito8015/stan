@@ -1,5 +1,5 @@
-#ifndef __STAN__MCMC__ENSEMBLE__BASE_ENSEMBLE_HPP__
-#define __STAN__MCMC__ENSEMBLE__BASE_ENSEMBLE_HPP__
+#ifndef STAN__MCMC__ENSEMBLE__BASE_ENSEMBLE_HPP
+#define STAN__MCMC__ENSEMBLE__BASE_ENSEMBLE_HPP
 
 #include <iostream>
 #include <vector>
@@ -130,12 +130,12 @@ namespace stan {
 
       double log_prob(Eigen::VectorXd& q) {
         try {
-          model_.template log_prob<false,true>(q, this->_err_stream);
+          model_.template log_prob<false,true>(q, this->err_stream_);
         } catch (std::domain_error e) {
-          this->write_error_msg_(this->_err_stream, e);
+          this->write_error_msg_(this->err_stream_, e);
           return std::numeric_limits<double>::infinity();
         }
-        return model_.template log_prob<false,true>(q, this->_err_stream);
+        return model_.template log_prob<false,true>(q, this->err_stream_);
       }
 
       sample transition(sample& init_sample) {
