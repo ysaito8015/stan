@@ -61,7 +61,7 @@ def run_Stan ( stan_cmd, datafile, method, num_runs) :
 
     foo_fh = open("foo_test.txt", 'w')
     foo_fh.write("test")
-    foo_fh.wirte("\n")
+    foo_fh.write("\n")
     foo_fh.close()
     
     for i in range(num_runs):
