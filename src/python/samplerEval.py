@@ -80,6 +80,8 @@ def run_Stan ( stan_cmd, datafile, method, num_runs) :
             chains.append(subprocess.Popen(args,stdout=subprocess.PIPE,stderr=subprocess.PIPE))
             chains_out.append("")
             chains_err.append("")
+            for arg in args
+                print(arg+'\n')
 
         for j in range(len(chains)):
             if (chains[j].returncode == None):
