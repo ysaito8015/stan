@@ -82,7 +82,7 @@ def run_Stan ( stan_cmd, datafile, method, num_runs) :
             chains_err.append("")
 
         for j in range(len(chains)):
-            print(chains[j].returncode+' '+j)
+            print(chains[j].returncode+' %d ' % j)
             chains_out[j], chains_err[j] = chains[j].communicate()
             print('finish chain %d ' % j + stan_cmd + ' ( %s)' % time.strftime('%x %X %Z'))
             # get max RAM from stdout
