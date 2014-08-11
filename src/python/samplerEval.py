@@ -1,4 +1,5 @@
-#!/usr/bin/env python                                                                                                                                                 
+#!/usr/bin/python
+
 """
 run cmdStan over models and data
 collect statistics
