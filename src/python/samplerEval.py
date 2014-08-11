@@ -59,7 +59,11 @@ def run_Stan ( stan_cmd, datafile, method, num_runs) :
     rams_filename = "results/stats_ram_" + modelname + "_" + method + ".txt"
     rams_fh = open(rams_filename,'w')
 
-
+    foo_fh = open("foo_test.txt", 'w')
+    foo_fh.write("test")
+    foo_fh.wirte("\n")
+    foo_fh.close()
+    
     for i in range(num_runs):
         runname = modelname + "_" + method + "_" + str(i+1)
         print("\n" + runname)
