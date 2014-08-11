@@ -13,6 +13,7 @@ import shutil
 import gzip
 import re
 import random
+import shlex
 
 def stop_err( msg ):
     sys.stderr.write( '%s\n' % msg )
@@ -74,8 +75,9 @@ def run_Stan ( stan_cmd, datafile, method, num_runs) :
             outputfile = "output" + str(j) + ".csv"
             binprint_cmd = ' '.join([binprint_cmd,outputfile])
             stan_cmd3 = stan_cmd2 + " random seed=" + str(seed) + " id=" + str(j+1) + " output file=" + outputfile
+            args = shlex.split(stan_cmd3)
             print('start chain %d ' % j + stan_cmd3 + ' ( %s)' % time.strftime('%x %X %Z'))
-            chains.append(subprocess.Popen(stan_cmd3,shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE))
+            chains.append(subprocess.Popen(args,stdout=subprocess.PIPE,stderr=subprocess.PIPE))
             chains_out.append("")
             chains_err.append("")
 
