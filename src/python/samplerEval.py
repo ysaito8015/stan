@@ -64,7 +64,8 @@ def run_Stan ( stan_cmd, datafile, method, num_runs) :
         runname = modelname + "_" + method + "_" + str(i+1)
         print("\n" + runname)
 
-        stan_cmd2 = "/usr/bin/time -v " + stan_cmd
+        # FIXME: on mac, use /usr/bin/time -l 
+        stan_cmd2 = "/usr/bin/time -v " + stan_cmd  
         binprint_cmd = "bin/print"
 
         chains = list()
@@ -83,6 +84,10 @@ def run_Stan ( stan_cmd, datafile, method, num_runs) :
             
         for j in range(len(chains)):
             chains_out[j], chains_err[j] = chains[j].communicate()
+            retcode = chains[j].returncode
+            if (retcode != 0):
+                msg = 'chain %d ' % j + stan_cmd + ' failed'
+                stop_err(msg)
             print('finish chain %d ' % j + stan_cmd + ' ( %s)' % time.strftime('%x %X %Z'))
             # get max RAM from stdout
             for line in chains_err[j].decode().split('\n'):
@@ -114,6 +119,10 @@ def run_Stan ( stan_cmd, datafile, method, num_runs) :
         # run bin/print on output.csv
         p1 = subprocess.Popen(binprint_cmd.split(),stdout=subprocess.PIPE,stderr=subprocess.PIPE)
         stdout, stderr = p1.communicate()
+        retcode = p1.returncode
+        if (retcode != 0):
+            msg = binprint_cmd + ' failed'
+            stop_err(msg)
         munge_binprint(stdout,params_fh)
 
         if saveOutputCsv:
