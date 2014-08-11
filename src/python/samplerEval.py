@@ -112,7 +112,7 @@ def run_Stan ( stan_cmd, datafile, method, num_runs) :
                 
             
         # run bin/print on output.csv
-        p1 = subprocess.Popen(binprint_cmd.split(),shell=False,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        p1 = subprocess.Popen(binprint_cmd.split(),stdout=subprocess.PIPE,stderr=subprocess.PIPE)
         stdout, stderr = p1.communicate()
         munge_binprint(stdout,params_fh)
 
