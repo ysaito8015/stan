@@ -64,7 +64,7 @@ def run_Stan ( stan_cmd, datafile, method, num_runs) :
         runname = modelname + "_" + method + "_" + str(i+1)
         print("\n" + runname)
 
-        stan_cmd2 = "/usr/bin/time -l " + stan_cmd
+        stan_cmd2 = "/usr/bin/time -v " + stan_cmd
         binprint_cmd = "bin/print"
 
         chains = list()
@@ -80,11 +80,8 @@ def run_Stan ( stan_cmd, datafile, method, num_runs) :
             chains.append(subprocess.Popen(args,stdout=subprocess.PIPE,stderr=subprocess.PIPE))
             chains_out.append("")
             chains_err.append("")
-            print '\n'.join(args)
             
         for j in range(len(chains)):
-            if (chains[j].returncode == None):
-                print("Not done %d" % j)
             chains_out[j], chains_err[j] = chains[j].communicate()
             print('finish chain %d ' % j + stan_cmd + ' ( %s)' % time.strftime('%x %X %Z'))
             # get max RAM from stdout
