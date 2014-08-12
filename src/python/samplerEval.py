@@ -97,8 +97,8 @@ def run_Stan ( stan_cmd, datafile, method, num_runs, job_num) :
                     tokens = line.split()
                     # for mac users use
                     # rams_fh.write(tokens[0])
-                    ram_fh.write(line)
-                    ram_fh.write('\n')
+                    rams_fh.write(line)
+                    rams_fh.write('\n')
                     rams_fh.write(tokens[5])
                     rams_fh.write(' ')
                     break;
