@@ -91,9 +91,13 @@ def run_Stan ( stan_cmd, datafile, method, num_runs, job_num) :
             print('finish chain %d ' % j + stan_cmd + ' ( %s)' % time.strftime('%x %X %Z'))
             # get max RAM from stdout
             for line in chains_err[j].decode().split('\n'):
-                if re.search("maximum resident set size",line):
+                # for mac users use
+                # if re.search("maximum resident set size",line):
+                if re.search("Maximum resident set size (kbytes):",line):
                     tokens = line.split()
-                    rams_fh.write(tokens[0])
+                    # for mac users use
+                    # rams_fh.write(tokens[0])
+                    rams_fh.write(tokens[6])
                     rams_fh.write(' ')
                     break;
             # grep output.csv for time info
