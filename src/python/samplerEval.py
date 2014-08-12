@@ -73,7 +73,7 @@ def run_Stan ( stan_cmd, datafile, method, num_runs, job_num) :
         chains_err = list()
         seed = random.randint(1,10000)
         for j in range(4):
-            outputfile = "output" + str(j+4*job_num) + ".csv"
+            outputfile = "output" + str(job_num) + str(j) + ".csv"
             binprint_cmd = ' '.join([binprint_cmd,outputfile])
             stan_cmd3 = stan_cmd2 + " random seed=" + str(seed) + " id=" + str(j+1) + " output file=" + outputfile
             args = shlex.split(stan_cmd3)
@@ -97,7 +97,7 @@ def run_Stan ( stan_cmd, datafile, method, num_runs, job_num) :
                     rams_fh.write(' ')
                     break;
             # grep output.csv for time info
-            outputfile = "output" + str(j+4*job_num) + ".csv"
+            outputfile = "output" + str(job_num) + str(j) + ".csv"
             for line in open(outputfile,'r'):
                 if re.search("(Warm-up)",line):
                     tokens = line.split()
@@ -156,7 +156,7 @@ def munge_binprint( output, fh ):
                 skip = True
 
 def main():
-    if (len(sys.argv) < 7):
+    if (len(sys.argv) < 8):
         stop_err("usage: samplerEval <model> <datafile> <method> <num_warmup> <num_samples> <num_runs> ")
 
     model = sys.argv[1]
