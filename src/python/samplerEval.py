@@ -23,31 +23,31 @@ def stop_err( msg ):
 def run_JAGS():
     print("run JAGS")
     
-def run_Stan_NUTS( model, datafile, num_warmup, num_samples, num_runs ):
+def run_Stan_NUTS( model, datafile, num_warmup, num_samples, num_runs, job_num ):
     # setup stan command
     command = model + " sample num_warmup=" + str(num_warmup) + " num_samples=" + str(num_samples) + " data file=" + datafile
     # don't save warmup, number of warmups, samples
     print(command)
-    run_Stan(command, datafile, "nuts", num_runs)
+    run_Stan(command, datafile, "nuts", num_runs, job_num)
         
-def run_Stan_Stretch_Ensemble( model, datafile, num_warmup, num_samples, num_runs ):
+def run_Stan_Stretch_Ensemble( model, datafile, num_warmup, num_samples, num_runs, job_num ):
     # setup stan command
     command = model + " sample algorithm=stretch_ensemble num_warmup=" + str(num_warmup) + " num_samples=" + str(num_samples) + " data file=" + datafile
     # don't save warmup, number of warmups, samples
     print(command)
-    run_Stan(command, datafile, "stretch_ensemble", num_runs)
+    run_Stan(command, datafile, "stretch_ensemble", num_runs, job_num)
             
-def run_Stan_Walk_Ensemble( model, datafile, num_warmup, num_samples, num_runs ):
+def run_Stan_Walk_Ensemble( model, datafile, num_warmup, num_samples, num_runs, job_num ):
     # setup stan command
     command = model + " sample algorithm=walk_ensemble num_warmup=" + str(num_warmup) + " num_samples=" + str(num_samples) + " data file=" + datafile
     # don't save warmup, number of warmups, samples
     print(command)
-    run_Stan(command, datafile, "walk_ensemble", num_runs)
+    run_Stan(command, datafile, "walk_ensemble", num_runs, job_num)
     
 # run_Stan:  does N runs of cmdStan
 # collects run times and parameter stats from each run
 # optionally saves sampler output
-def run_Stan ( stan_cmd, datafile, method, num_runs) :
+def run_Stan ( stan_cmd, datafile, method, num_runs, job_num) :
     saveOutputCsv = False
     datapath = datafile.split('/')
     datafilename = datapath[len(datapath)-1]
@@ -73,7 +73,7 @@ def run_Stan ( stan_cmd, datafile, method, num_runs) :
         chains_err = list()
         seed = random.randint(1,10000)
         for j in range(4):
-            outputfile = "output" + str(j) + ".csv"
+            outputfile = "output" + str(j+4*job_num) + ".csv"
             binprint_cmd = ' '.join([binprint_cmd,outputfile])
             stan_cmd3 = stan_cmd2 + " random seed=" + str(seed) + " id=" + str(j+1) + " output file=" + outputfile
             args = shlex.split(stan_cmd3)
@@ -97,7 +97,7 @@ def run_Stan ( stan_cmd, datafile, method, num_runs) :
                     rams_fh.write(' ')
                     break;
             # grep output.csv for time info
-            outputfile = "output" + str(j) + ".csv"
+            outputfile = "output" + str(j+4*job_num) + ".csv"
             for line in open(outputfile,'r'):
                 if re.search("(Warm-up)",line):
                     tokens = line.split()
@@ -165,13 +165,14 @@ def main():
     num_warmup = int(sys.argv[4])
     num_samples = int(sys.argv[5])
     num_runs = int(sys.argv[6])
+    job_num = int(sys.argv[7])
 
     if method.lower().startswith("nuts"):
-        run_Stan_NUTS(model, datafile, num_warmup, num_samples, num_runs)
+        run_Stan_NUTS(model, datafile, num_warmup, num_samples, num_runs, job_num)
     elif method.lower().startswith("str"):
-        run_Stan_Stretch_Ensemble(model, datafile, num_warmup, num_samples, num_runs)
+        run_Stan_Stretch_Ensemble(model, datafile, num_warmup, num_samples, num_runs, job_num)
     elif method.lower().startswith("walk"):
-        run_Stan_Walk_Ensemble(model, datafile, num_warmup, num_samples, num_runs)
+        run_Stan_Walk_Ensemble(model, datafile, num_warmup, num_samples, num_runs, job_num)
     # run model using JAGS - 
     
     print('\nall processing completed ( %s)\n' % time.strftime('%x %X %Z'))
