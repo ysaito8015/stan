@@ -93,17 +93,13 @@ def run_Stan ( stan_cmd, datafile, method, num_runs, job_num) :
             for line in chains_err[j].decode().split('\n'):
                 # for mac users use
                 # if re.search("maximum resident set size",line):
-                if re.search("Maximum resident set size (kbytes):",line):
+                if re.search("Maximum resident set size",line):
                     tokens = line.split()
                     # for mac users use
                     # rams_fh.write(tokens[0])
+                    ram_fh.write(line)
+                    ram_fh.write('\n')
                     rams_fh.write(tokens[5])
-                    print(tokens[0]+'\n')
-                    print(tokens[1]+'\n')
-                    print(tokens[2]+'\n')
-                    print(tokens[3]+'\n')
-                    print(tokens[4]+'\n')
-                    print(tokens[5]+'\n')
                     rams_fh.write(' ')
                     break;
             # grep output.csv for time info
