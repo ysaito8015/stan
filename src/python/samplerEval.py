@@ -98,6 +98,12 @@ def run_Stan ( stan_cmd, datafile, method, num_runs, job_num) :
                     # for mac users use
                     # rams_fh.write(tokens[0])
                     rams_fh.write(tokens[5])
+                    print(tokens[0]+'\n')
+                    print(tokens[1]+'\n')
+                    print(tokens[2]+'\n')
+                    print(tokens[3]+'\n')
+                    print(tokens[4]+'\n')
+                    print(tokens[5]+'\n')
                     rams_fh.write(' ')
                     break;
             # grep output.csv for time info
