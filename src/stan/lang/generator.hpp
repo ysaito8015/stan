@@ -200,7 +200,8 @@ namespace stan {
         if (num_str.find_first_of("eE.") == std::string::npos)
           o_ << ".0";  // trailing 0 to ensure C++ makes it a double
       }
-      void operator()(const array_literal& x) const {
+
+      void operator()(const array_contents& x) const {
         o_ << "stan::math::new_array<";
         generate_type("foobar",
                       x.args_,
@@ -214,6 +215,7 @@ namespace stan {
         }
         o_ << ".array()";
       }
+
       void operator()(const variable& v) const { o_ << v.name_; }
       void operator()(int n) const {   // NOLINT
         o_ << static_cast<long>(n);    // NOLINT

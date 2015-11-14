@@ -205,7 +205,7 @@ namespace stan {
       bool operator()(const double_literal& /*x*/) const {
         return true;
       }
-      bool operator()(const array_literal& x) const {
+      bool operator()(const array_contents& x) const {
         for (size_t i = 0; i < x.args_.size(); ++i)
           if (!boost::apply_visitor(*this, x.args_[i].expr_))
             return false;
