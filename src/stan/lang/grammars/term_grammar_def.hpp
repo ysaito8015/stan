@@ -61,6 +61,9 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::fun,
                           (std::string, name_)
                           (std::vector<stan::lang::expression>, args_) )
 
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::array_contents,
+                          (std::vector<stan::lang::expression>, args_) )
+
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::int_literal,
                           (int, val_)
                           (stan::lang::expr_type, type_))
@@ -189,6 +192,7 @@ namespace stan {
     };
     boost::phoenix::function<validate_integrate_ode> validate_integrate_ode_f;
 
+    
     struct set_fun_type {
       //! @cond Doxygen_Suppress
       template <class> struct result;
@@ -306,6 +310,32 @@ namespace stan {
     };
     boost::phoenix::function<set_fun_type_named> set_fun_type_named_f;
 
+    // new stuff - fixme ***********************************************
+    struct set_array_type {
+      //! @cond Doxygen_Suppress
+      template <class> struct result;
+      //! @endcond
+      template <typename F, typename T1, typename T2, typename T3,
+                typename T4, typename T5>
+      struct result<F(T1, T2, T3, T4, T5)> { typedef void type; };
+
+      void operator()(expression& array_contents_result,
+                      array_contents& array_contents,
+                      const var_origin& var_origin,
+                      bool& pass,
+                      std::ostream& error_msgs) const {
+        std::vector<expr_type> arg_types;
+        for (size_t i = 0; i < array_contents.args_.size(); ++i)
+          arg_types.push_back(array_contents.args_[i].expression_type());
+        array_contents.type_ = ILL_FORMED_T;
+        if (array_contents.type_ == ILL_FORMED_T) {
+          pass = false;
+          return;
+        }
+      boost::phoenix::function<set_array_type> set_array_type_f;
+    // end new stuff - fixme ***********************************************
+
+    
     struct exponentiation_expr {
       //! @cond Doxygen_Suppress
       template <class> struct result;
@@ -864,9 +894,14 @@ namespace stan {
                                 _pass)])
         | int_literal_r[set_val5_f(_val, _1)]
         | double_literal_r[set_val5_f(_val, _1)]
+        | (array_contents_r(_r1)[set_val5_f(_c, _1)]
+           > eps[set_array_type_f(_val, _c, _r1, _pass,
+                                           boost::phoenix::ref(error_msgs_))])
         | (lit('(')
            > expression_g(_r1)[set_val5_f(_val, _1)]
            > lit(')'));
+
+      //set_array_contents_type_r
 
       int_literal_r.name("integer literal");
       int_literal_r
@@ -879,6 +914,11 @@ namespace stan {
       double_literal_r
         %= double_;
 
+      array_contents_r("expression");
+      array_contents_r
+        %= lit('{')
+        >> expression_g(_r1) % ','
+        > lit('}');
 
       fun_r.name("function and argument expressions");
       fun_r

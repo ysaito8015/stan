@@ -66,11 +66,15 @@ namespace stan {
 
 
       boost::spirit::qi::rule<Iterator,
-                              boost::spirit::qi::locals<variable, fun>,
+                              boost::spirit::qi::locals<variable, fun, expression>,
                               expression(var_origin),
                               whitespace_grammar<Iterator> >
       factor_r;
 
+      boost::spirit::qi::rule<Iterator,
+                              array_contents(var_origin),
+                              whitespace_grammar<Iterator> >
+      array_contents_r;
 
       boost::spirit::qi::rule<Iterator,
                               fun(var_origin),
