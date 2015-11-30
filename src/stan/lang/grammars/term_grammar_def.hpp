@@ -310,8 +310,7 @@ namespace stan {
     };
     boost::phoenix::function<set_fun_type_named> set_fun_type_named_f;
 
-    // new stuff - fixme ***********************************************
-    struct set_array_type {
+    struct set_array_contents_type {
       //! @cond Doxygen_Suppress
       template <class> struct result;
       //! @endcond
@@ -319,22 +318,52 @@ namespace stan {
                 typename T4, typename T5>
       struct result<F(T1, T2, T3, T4, T5)> { typedef void type; };
 
-      void operator()(expression& array_contents_result,
+      void operator()(expression& e, 
                       array_contents& array_contents,
                       const var_origin& var_origin,
                       bool& pass,
                       std::ostream& error_msgs) const {
-        std::vector<expr_type> arg_types;
-        for (size_t i = 0; i < array_contents.args_.size(); ++i)
-          arg_types.push_back(array_contents.args_[i].expression_type());
-        array_contents.type_ = ILL_FORMED_T;
-        if (array_contents.type_ == ILL_FORMED_T) {
+        if (array_contents.args_.size() == 0) {
+          // shouldn't occur, because of % operator used to construct it
+          error_msgs << "array contents size 0, but must be > 0";
+          array_contents.type_ = expr_type(ILL_FORMED_T);
           pass = false;
           return;
         }
-      boost::phoenix::function<set_array_type> set_array_type_f;
-    // end new stuff - fixme ***********************************************
-
+        expr_type et;
+        et = array_contents.args_[0].expression_type();
+        for (size_t i = 1; i < array_contents.args_.size(); ++i) {
+          expr_type et_next;
+          et_next = array_contents.args_[i].expression_type();
+          if (et.num_dims_ != et_next.num_dims_) {
+            error_msgs << "expressions for elements of array must have"
+                       << " same array sizes; found"
+                       << " previous type=" << et
+                       << "; type at position " << i << "=" << et_next;
+            array_contents.type_ = expr_type(ILL_FORMED_T);
+            pass = false;
+            return;
+          }
+          if ((et.base_type_ == INT_T && et_next.base_type_ == DOUBLE_T)
+              || (et.base_type_ == DOUBLE_T && et_next.base_type_ == INT_T)) {
+            et.base_type_ = DOUBLE_T;
+          } else if (et.base_type_ != et_next.base_type_) {
+            error_msgs << "expressions for elements of array must have"
+                       << " the same or promotable types; found"
+                       << " previous type=" << et
+                       << "; type at position " << i << "=" << et_next;
+            array_contents.type_ = expr_type(ILL_FORMED_T);
+            pass = false;
+            return;
+          }
+        }
+        ++et.num_dims_;
+        array_contents.type_ = et;
+        e = array_contents;
+        pass = true;
+      }
+    };
+    boost::phoenix::function<set_array_contents_type> set_array_contents_type_f;
     
     struct exponentiation_expr {
       //! @cond Doxygen_Suppress
@@ -792,6 +821,7 @@ namespace stan {
       using boost::spirit::qi::_1;
       using boost::spirit::qi::_a;
       using boost::spirit::qi::_b;
+      using boost::spirit::qi::_c;
       using boost::spirit::qi::char_;
       using boost::spirit::qi::double_;
       using boost::spirit::qi::eps;
@@ -895,14 +925,13 @@ namespace stan {
         | int_literal_r[set_val5_f(_val, _1)]
         | double_literal_r[set_val5_f(_val, _1)]
         | (array_contents_r(_r1)[set_val5_f(_c, _1)]
-           > eps[set_array_type_f(_val, _c, _r1, _pass,
-                                           boost::phoenix::ref(error_msgs_))])
+           > eps[set_array_contents_type_f(_val, _c, _r1, _pass,
+                                  boost::phoenix::ref(error_msgs_))])
         | (lit('(')
            > expression_g(_r1)[set_val5_f(_val, _1)]
            > lit(')'));
 
-      //set_array_contents_type_r
-
+      
       int_literal_r.name("integer literal");
       int_literal_r
         %= int_
@@ -914,12 +943,12 @@ namespace stan {
       double_literal_r
         %= double_;
 
-      array_contents_r("expression");
+      array_contents_r.name("expression");
       array_contents_r
-        %= lit('{')
+        %=  lit('{')
         >> expression_g(_r1) % ','
-        > lit('}');
-
+        >> lit('}');
+      
       fun_r.name("function and argument expressions");
       fun_r
         %= identifier_r

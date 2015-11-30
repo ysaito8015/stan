@@ -59,6 +59,14 @@ TEST(langParserTermGrammar, setFunTypeNamed) {
   test_parsable("validate_set_fun_type_named_good");
 }
 
+TEST(langParserTermGrammar, arrayContentsFun) {
+  test_parsable("validate_array_contents_good");
+  test_throws("validate_array_contents_bad1",
+              "base type mismatch in assignment; variable name = int_1_a, type = int; right-hand side type=real");
+  test_throws("validate_array_contents_bad2",
+              "dimension mismatch in assignment; variable name = int_1_a, num dimensions given = 1; right-hand side dimensions = 2");
+}
+
 TEST(langGrammarsTermGrammar, operatorErrorMsg) {
   test_throws("op_addition_bad",
               "matrix + vector",
