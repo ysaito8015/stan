@@ -307,11 +307,19 @@ TEST(langGenerator,funArgs5lp) {
 }
 
 
-TEST(langGenerator,arrayContent1) {
+TEST(langGenerator,arrayContentIntPrimitive) {
   expect_matches(1,
                  "model { int int_1_a[3]; int_1_a <- {1, 2, 3}; }",
                  "stan::model::new_array<std::vector<int> >().add(1).add(2).add(3).array()");
 }
+
+
+// TEST(langGenerator,arrayContentRealPrimitive) {
+// TEST(langGenerator,arrayContentIntArrayArray) {
+// TEST(langGenerator,arrayContentRealArrayArray) {
+// TEST(langGenerator,arrayContentEigen) {
+
+
 
 TEST(langGenerator,shortCircuit1) {
   expect_matches(1,

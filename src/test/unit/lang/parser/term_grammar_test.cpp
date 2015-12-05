@@ -59,12 +59,17 @@ TEST(langParserTermGrammar, setFunTypeNamed) {
   test_parsable("validate_set_fun_type_named_good");
 }
 
-TEST(langParserTermGrammar, arrayContentsFun) {
+TEST(langParserTermGrammar, arrayContentsGood) {
   test_parsable("validate_array_contents_good");
+}
+
+TEST(langParserTermGrammar, arrayContentsBad) {
   test_throws("validate_array_contents_bad1",
               "base type mismatch in assignment; variable name = int_1_a, type = int; right-hand side type=real");
   test_throws("validate_array_contents_bad2",
               "dimension mismatch in assignment; variable name = int_1_a, num dimensions given = 1; right-hand side dimensions = 2");
+  test_throws("validate_array_contents_bad3",
+              "PARSER EXPECTED: <expression assignable to left-hand side>");
 }
 
 TEST(langGrammarsTermGrammar, operatorErrorMsg) {
