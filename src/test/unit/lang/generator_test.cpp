@@ -306,6 +306,13 @@ TEST(langGenerator,funArgs5lp) {
                  "foo_lp(");
 }
 
+
+TEST(langGenerator,arrayContent1) {
+  expect_matches(1,
+                 "model { int int_1_a[3]; int_1_a <- {1, 2, 3}; }",
+                 "stan::model::new_array<std::vector<int> >().add(1).add(2).add(3).array()");
+}
+
 TEST(langGenerator,shortCircuit1) {
   expect_matches(1,
                  "transformed data { int a; a <- 1 || 2; }"

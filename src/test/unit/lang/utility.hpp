@@ -177,7 +177,11 @@ void expect_matches(int n,
                     const std::string& stan_code,
                     const std::string& target) {
   std::string model_cpp = model_to_cpp(stan_code);
-  EXPECT_EQ(n, count_matches(target,model_cpp));
+  EXPECT_EQ(n, count_matches(target,model_cpp)) << std::endl
+       << "MODEL_CPP: " << model_cpp
+       << std::endl
+       << "EXPECTED (as substring): " << target
+       << std::endl;
 }
 
 #endif

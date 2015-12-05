@@ -54,7 +54,9 @@ TEST(ModelNewArray, doubleArrayArray) {
 TEST(ModelNewArray, chainDoubleA2) {
 
   std::vector<stan::model::new_array<int> > z = 
-    stan::model::new_array<stan::model::new_array<int> >().add(stan::model::new_array<int>().add(1).add(2)).add(stan::model::new_array<int>().add(1).add(2)).array();
+    stan::model::new_array<stan::model::new_array<int> >().add(
+       stan::model::new_array<int>().add(1).add(2)).add(
+       stan::model::new_array<int>().add(1).add(2)).array();
 
   EXPECT_EQ(2, z.size());
 

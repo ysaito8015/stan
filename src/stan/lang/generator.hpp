@@ -168,7 +168,6 @@ namespace stan {
     }
 
     void generate_type(const std::string& base_type,
-                       const std::vector<expression>& /*dims*/,
                        size_t end,
                        std::ostream& o) {
       for (size_t i = 0; i < end; ++i) o << "std::vector<";
@@ -202,12 +201,12 @@ namespace stan {
       }
 
       void operator()(const array_contents& x) const {
-        o_ << "stan::math::new_array<";
-        generate_type("foobar",
-                      x.args_,
-                      x.args_.size(),
-                      o_);
-        o_ << ">()";
+        o_ << "stan::model::new_array<";
+        std::stringstream base_type_ss;
+        write_base_expr_type(base_type_ss, x.type_.base_type_);
+        std::string base_type_string = base_type_ss.str();
+        generate_type(base_type_string, x.type_.num_dims_, o_);
+        o_ << " >()";   // must have space before " >"
         for (size_t i = 0; i < x.args_.size(); ++i) {
           o_ << ".add(";
           generate_expression(x.args_[i], o_);
@@ -438,7 +437,7 @@ namespace stan {
         o << '(';
         generate_expression(dims[i].expr_, o);
         o << ',';
-        generate_type(base_type, dims, dims.size()- i - 1, o);
+        generate_type(base_type, dims.size()- i - 1, o);
       }
 
       o << '(';
@@ -580,7 +579,7 @@ namespace stan {
       // define variable with initializer
       o << INDENT2
         << var_name << " = ";
-      generate_type(base_type, dims, dims.size(), o);
+      generate_type(base_type, dims.size(), o);
       generate_initializer(o, base_type, dims, type_arg1, type_arg2);
     }
 
@@ -3164,7 +3163,7 @@ namespace stan {
                                 const expression& type_arg2 = expression())
       const {
         o_ << INDENT2;
-        generate_type(base_type, dims, dims.size(), o_);
+        generate_type(base_type, dims.size(), o_);
         o_ << ' ' << name;
 
         generate_initializer(o_, base_type, dims, type_arg1, type_arg2);
