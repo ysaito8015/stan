@@ -309,15 +309,32 @@ TEST(langGenerator,funArgs5lp) {
 
 TEST(langGenerator,arrayContentIntPrimitive) {
   expect_matches(1,
-                 "model { int int_1_a[3]; int_1_a <- {1, 2, 3}; }",
-                 "stan::model::new_array<std::vector<int> >().add(1).add(2).add(3).array()");
+                 " model { int a_i1[3]; a_i1 <- {1, 2, 3}; }",
+                 "stan::model::array_builder<std::vector<int> >().add(1).add(2).add(3).array()");
+}
+
+TEST(langGenerator,arrayContentIntArray) {
+  expect_matches(1,
+                 " model { int a_i1[2,2]; a_i1 <- { {1, 2}, {3, 4}}; }",
+                 "stan::model::array_builder<std::vector<std::vector<int> > >()"
+                 ".add(stan::model::array_builder<std::vector<int> >().add(1).add(2).array())"
+                 ".add(stan::model::array_builder<std::vector<int> >().add(3).add(4).array()).array())");
 }
 
 
-// TEST(langGenerator,arrayContentRealPrimitive) {
-// TEST(langGenerator,arrayContentIntArrayArray) {
+
+
+TEST(langGenerator,arrayContentRealPrimitive) {
+  expect_matches(1,
+                 " model { real a_r1[3]; a_r1 <- {1.0, 2, 3}; }",
+                 "stan::model::array_builder<std::vector<real> >().add(1.0).add(2).add(3).array()");
+}
+
 // TEST(langGenerator,arrayContentRealArrayArray) {
-// TEST(langGenerator,arrayContentEigen) {
+
+// TEST(langGenerator,arrayContentVectorArray) {
+//    "transformed data{ vector[3] a_v1[5]; }
+
 
 
 
