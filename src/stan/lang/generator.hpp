@@ -201,7 +201,7 @@ namespace stan {
       }
 
       void operator()(const array_contents& x) const {
-        o_ << "stan::model::new_array<";
+        o_ << "stan::model::array_builder<";
         std::stringstream base_type_ss;
         write_base_expr_type(base_type_ss, x.type_.base_type_);
         std::string base_type_string = base_type_ss.str();
