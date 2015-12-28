@@ -2954,6 +2954,8 @@ namespace stan {
         << EOL;
       o << INDENT2 << ": prob_grad(0) {"
         << EOL;  // resize 0 with var_resizing
+
+      o << INDENT2 << "typedef double T__;" << EOL;
       o << INDENT2 << "current_statement_begin__ = -1;"
         << EOL2;
       o << INDENT2 << "static const char* function__ = \""
