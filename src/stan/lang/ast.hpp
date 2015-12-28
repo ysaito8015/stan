@@ -490,17 +490,17 @@ namespace stan {
     typedef int var_origin;
     const int model_name_origin = 0;
     const int data_origin = 1;
-    const int transformed_data_origin = 2;
+    const int transformed_data_origin = 2;  // double
     const int parameter_origin = 3;
     const int transformed_parameter_origin = 4;
-    const int derived_origin = 5;
-    const int local_origin = 6;
+    const int derived_origin = 5;  // double
+    const int local_origin = 6;  // ???
     const int function_argument_origin = 7;
     const int function_argument_origin_lp = 8;
-    const int function_argument_origin_rng = 9;
+    const int function_argument_origin_rng = 9;  // double
     const int void_function_argument_origin = 10;
     const int void_function_argument_origin_lp = 11;
-    const int void_function_argument_origin_rng = 12;
+    const int void_function_argument_origin_rng = 12;  // double
 
     void print_var_origin(std::ostream& o, const var_origin& vo);
 
