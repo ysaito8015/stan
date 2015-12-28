@@ -22,6 +22,9 @@ namespace stan {
     void generate_expression(const expression& e, std::ostream& o);
     void generate_expression(const expression& e, bool user_facing,
                              std::ostream& o);
+    void generate_bare_type(const expr_type& t,
+                            const std::string& scalar_t_name,
+                            std::ostream& out);
 
     const std::string EOL("\n");
     const std::string EOL2("\n\n");
@@ -202,11 +205,8 @@ namespace stan {
 
       void operator()(const array_contents& x) const {
         o_ << "stan::model::array_builder<";
-        std::stringstream base_type_ss;
-        write_base_expr_type(base_type_ss, x.type_.base_type_);
-        std::string base_type_string = base_type_ss.str();
-        generate_type(base_type_string, x.type_.num_dims_, o_);
-        o_ << " >()";   // must have space before " >"
+        generate_bare_type(x.type_, "T__", o_);
+        o_ << " >()";
         for (size_t i = 0; i < x.args_.size(); ++i) {
           o_ << ".add(";
           generate_expression(x.args_[i], o_);
@@ -3832,6 +3832,7 @@ namespace stan {
     }
 
 
+    //    pass in const bool is_var_;
     // see init_member_var_visgen for cut & paste
     struct write_array_visgen : public visgen {
       explicit write_array_visgen(std::ostream& o)
@@ -4114,7 +4115,8 @@ namespace stan {
       }
     };
 
-
+    // need to fix this method to handle typename T__"
+    // add typename T__ to template def?
     void generate_write_array_method(const program& prog,
                                      const std::string& model_name,
                                      std::ostream& o) {
@@ -4127,6 +4129,9 @@ namespace stan {
       o << INDENT << "                 bool include_gqs__ = true," << EOL;
       o << INDENT
         << "                 std::ostream* pstream__ = 0) const {" << EOL;
+      // o << INDENT2;
+      // generate_typedef("T__", "double");
+      o << INDENT2 << "typedef double T__;" << EOL;
       o << INDENT2 << "vars__.resize(0);" << EOL;
       o << INDENT2
         << "stan::io::reader<double> in__(params_r__,params_i__);"<< EOL;

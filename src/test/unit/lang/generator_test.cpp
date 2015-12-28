@@ -315,25 +315,29 @@ TEST(langGenerator,arrayContentIntPrimitive) {
 
 TEST(langGenerator,arrayContentIntArray) {
   expect_matches(1,
-                 " model { int a_i1[2,2]; a_i1 <- { {1, 2}, {3, 4}}; }",
+                 " model { int a_int_dim2[2,2]; a_int_dim2 <- { {1, 2}, {3, 4}}; }",
                  "stan::model::array_builder<std::vector<std::vector<int> > >()"
                  ".add(stan::model::array_builder<std::vector<int> >().add(1).add(2).array())"
                  ".add(stan::model::array_builder<std::vector<int> >().add(3).add(4).array()).array())");
 }
 
-
-
-
 TEST(langGenerator,arrayContentRealPrimitive) {
   expect_matches(1,
                  " model { real a_r1[3]; a_r1 <- {1.0, 2, 3}; }",
-                 "stan::model::array_builder<std::vector<real> >().add(1.0).add(2).add(3).array()");
+                 "stan::model::array_builder<std::vector<T__> >().add(1.0).add(2).add(3).array()");
+}
+
+TEST(langGenerator,arrayContentRealArray) {
+  expect_matches(1,
+                 " model { real x; real a_real_dim2[2,2]; a_real_dim2 <- { {x, 0}, {0, x}}; }",
+                 "stan::model::array_builder<std::vector<std::vector<T__> > >()"
+                 ".add(stan::model::array_builder<std::vector<T__> >().add(x).add(0).array())"
+                 ".add(stan::model::array_builder<std::vector<T__> >().add(0).add(x).array()).array())");
 }
 
 // TEST(langGenerator,arrayContentRealArrayArray) {
 
 // TEST(langGenerator,arrayContentVectorArray) {
-//    "transformed data{ vector[3] a_v1[5]; }
 
 
 
