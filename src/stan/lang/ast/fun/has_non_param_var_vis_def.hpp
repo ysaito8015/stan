@@ -104,6 +104,12 @@ namespace stan {
       return boost::apply_visitor(*this, e.y_.expr_);
     }
 
+    bool has_non_param_var_vis::operator()(const quadratic_optimizer_control& e)
+      const {
+      // if any vars, return true
+      return boost::apply_visitor(*this, e.theta_.expr_);
+    }
+
     bool has_non_param_var_vis::operator()(const map_rect& e)
       const {
       // if any vars, return true

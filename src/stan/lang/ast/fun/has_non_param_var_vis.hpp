@@ -120,6 +120,11 @@ namespace stan {
        */
        bool operator()(const algebra_solver_control& e) const;
 
+       /**
+        * 
+        */
+       bool operator()(const quadratic_optimizer_control& e) const;
+
       /**
        * Return true if the specified expression contains a variable
        * not declared as a parameter.

@@ -21,6 +21,7 @@ namespace stan {
     struct integrate_ode_control;
     struct algebra_solver;
     struct algebra_solver_control;
+    struct quadratic_optimizer_control;
     struct map_rect;
     struct index_op;
     struct index_op_sliced;
@@ -40,6 +41,7 @@ namespace stan {
                              boost::recursive_wrapper<integrate_ode_control>,
                              boost::recursive_wrapper<algebra_solver>,
                              boost::recursive_wrapper<algebra_solver_control>,
+                             boost::recursive_wrapper<quadratic_optimizer_control>,
                              boost::recursive_wrapper<map_rect>,
                              boost::recursive_wrapper<fun>,
                              boost::recursive_wrapper<index_op>,
@@ -64,6 +66,7 @@ namespace stan {
       expression(const integrate_ode_control& expr);  // NOLINT
       expression(const algebra_solver& expr);  // NOLINT(runtime/explicit)
       expression(const algebra_solver_control& expr);  // NOLINT
+      expression(const quadratic_optimizer_control& expr);  // NOLINT
       expression(const map_rect& expr);  // NOLINT
       expression(const index_op& expr);  // NOLINT(runtime/explicit)
       expression(const index_op_sliced& expr);  // NOLINT(runtime/explicit)

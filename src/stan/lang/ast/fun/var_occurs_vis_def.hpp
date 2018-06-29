@@ -70,6 +70,11 @@ namespace stan {
       return false;  // no refs persist out of algebra_solver_control() call
     }
 
+    bool var_occurs_vis::operator()(const quadratic_optimizer_control& e)
+      const {
+      return false;  // no refs persist out of quadratic_optimizer_control() call
+    }
+
     bool var_occurs_vis::operator()(const map_rect& e) const {
       return false;  // no refs persist out of map_rect() call
     }

@@ -106,6 +106,11 @@ namespace stan {
       algebra_solver_control_r;
 
       boost::spirit::qi::rule<Iterator,
+                              quadratic_optimizer_control(scope),
+                              whitespace_grammar<Iterator> >
+      quadratic_optimizer_control_r;
+
+      boost::spirit::qi::rule<Iterator,
                               map_rect(scope),
                               whitespace_grammar<Iterator> >
       map_rect_r;

@@ -619,6 +619,16 @@ namespace stan {
     validate_algebra_solver_control_f;
 
     // called from: term_grammar
+    struct validate_quadratic_optimizer_control
+      : public phoenix_functor_quaternary {
+      void operator()(const quadratic_optimizer_control& quad_fun,
+                      const variable_map& var_map, bool& pass,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<quadratic_optimizer_control>
+    validate_quadratic_optimizer_control_f;
+
+    // called from: term_grammar
     /**
      * Functor for validating the arguments to map_rect.
      */
@@ -813,6 +823,7 @@ namespace stan {
       bool operator()(const integrate_ode_control& x) const;
       bool operator()(const algebra_solver& x) const;
       bool operator()(const algebra_solver_control& x) const;
+      bool operator()(const quadratic_optimizer_control& x) const;
       bool operator()(const map_rect& x) const;
       bool operator()(const fun& x) const;
       bool operator()(const index_op& x) const;

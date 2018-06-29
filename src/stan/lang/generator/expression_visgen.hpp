@@ -220,6 +220,29 @@ namespace stan {
         o_ << ")";
       }
 
+      void operator()(const quadratic_optimizer_control& fx) const {
+        o_ << "quadratic_optimizer"
+           << '('
+           << fx.H_function_name_
+           << "_functor__(), "
+           << fx.v_function_name_
+           << "_functor__(), "
+           << fx.a_function_name_
+           << "_functor__(), "
+           << fx.b_function_name_
+           << "_functor__(), ";
+        generate_expression(fx.theta_, user_facing_, o_);
+        o_ << ", ";
+        generate_expression(fx.delta_, NOT_USER_FACING, o_);
+        o_ << ", ";
+        generate_expression(fx.delta_int_, NOT_USER_FACING, o_);
+        o_ << ", ";
+        generate_expression(fx.n_), NOT_USER_FACING, o_);
+        o_ << ", pstream__, ";
+        generate_expression(fx.tol_, NOT_USER_FACING, o_);
+        o_ << ")";
+      }
+
       void operator()(const map_rect& fx) const {
         o_ << "map_rect";
         o_ << "<" << fx.call_id_ << ", " << fx.fun_name_ << "_functor__>";

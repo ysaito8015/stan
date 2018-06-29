@@ -62,6 +62,17 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::algebra_solver_control,
                            (stan::lang::expression, fun_tol_)
                            (stan::lang::expression, max_num_steps_) )
 
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::quadratic_optimizer_control,
+                          (std::string, H_function_name_)
+                          (std::string, v_function_name_)
+                          (std::string, a_function_name_)
+                          (std::string, b_function_name_)
+                          (stan::lang::expression, theta_)
+                          (stan::lang::expression, delta_)
+                          (stan::lang::expression, delta_int_)
+                          (stan::lang::expression, n_)
+                          (stan::lang::expression, tol_) )
+
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::map_rect,
                           (std::string, fun_name_)
                           (stan::lang::expression, shared_params_)
@@ -271,6 +282,33 @@ namespace stan {
           [validate_algebra_solver_f(_val, boost::phoenix::ref(var_map_),
                                      _pass, boost::phoenix::ref(error_msgs_))];
 
+      quadratic_optimizer_control_r.name("expression");
+      quadratic_optimizer_control_r
+        %= lit("quadratic_optimizer")  // >> no_skip[!char_("a-zA-Z0-9_")]
+        > lit('(')
+        > identifier_r          // 1) H function name (function only)
+        > lit(',')
+        > identifier_r          // 2) v function name (function only)
+        > lit(',')
+        > identifier_r          // 3) a function name (function only)
+        > lit(',')
+        > identifier_r          // 4) b function name (function only)
+        > lit(',')
+        > expression_g(_r1)     // 5) theta
+        > lit(',')
+        > expression_g(_r1)     // 6) delta (data only)
+        > lit(',')
+        > expression_g(_r1)     // 7) delta_int (integer data only)
+        > lit(',')
+        > expression_g(_r1)     // 8) number of unknowns (interger data only)
+        > lit(',')
+        > expression_g(_r1)     // 9) tolerance (data only)
+        > lit(')')
+          [validate_quadratic_optimizer_control_f(_val,
+                                       boost::phoenix::ref(var_map_),
+                                       _pass,
+                                       boost::phoenix::ref(error_msgs_))];
+
       map_rect_r.name("map_rect");
       map_rect_r
           %= (lit("map_rect") >> no_skip[!char_("a-zA-Z0-9_")])
@@ -294,6 +332,7 @@ namespace stan {
         | integrate_ode_r(_r1)[assign_lhs_f(_val, _1)]
         | algebra_solver_control_r(_r1)[assign_lhs_f(_val, _1)]
         | algebra_solver_r(_r1)[assign_lhs_f(_val, _1)]
+        | quadratic_optimizer_control_r(_r1)[assign_lhs_f(_val, _1)]
         | map_rect_r(_r1)[assign_lhs_f(_val, _1)]
         | (fun_r(_r1)[assign_lhs_f(_b, _1)]
            > eps[set_fun_type_named_f(_val, _b, _r1, _pass,
