@@ -120,6 +120,11 @@ TEST(lang_parser, integrate_ode_bdf_control_bad) {
       "sixth argument to integrate_ode_bdf (real data) must be data only");
 }
 
+TEST(lang_parser, integrate_ode_bdf_control_bad2) {
+  test_throws("ode/issue-2565",
+              "whatevs");
+}
+
 TEST(lang_parser, integrate_ode_adams_bad) {
   test_throws("ode/adams/bad_adams_control_function_return",
       "first argument to integrate_ode_adams must be the name of a function with signature");
