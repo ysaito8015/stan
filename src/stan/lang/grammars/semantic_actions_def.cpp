@@ -1961,7 +1961,8 @@ namespace stan {
       }
 
     // 4) b function
-    expr_type b_result_type(expr_type(double_type(), 0), true);
+    expr_type b_result_type(double_type(), 0);
+    // expr_type b_result_type(expr_type(double_type(), 0), true);
     std::vector<function_arg_type> b_arg_types;
     b_arg_types.push_back(function_arg_type(expr_type(vector_type(),
                                                       0), true));  // theta
@@ -2013,9 +2014,9 @@ namespace stan {
                  << ". " << std::endl;
       pass = false;
     }
-    if (quad_fun.tol_.expression_type() != expr_type(double_type, 0)) {
+    if (!quad_fun.tol_.expression_type().is_primitive()) {
       error_msgs << "ninth argument to quadratic optimizer"
-                 << " must have type double for tolerance;"
+                 << " must have type int or real for tolerance;"
                  << " found type = "
                  << quad_fun.tol_.expression_type()
                  << ". " << std::endl;
@@ -2024,7 +2025,7 @@ namespace stan {
 
     // test data-only variables do not have parameters (int locals OK)
     if (has_var(quad_fun.delta_, var_map)) {
-      erorr_msgs << "sixth argument to quadratic_optimizer"
+      error_msgs << "sixth argument to quadratic_optimizer"
                  << " (real data)"
                  << " must be data only and not reference parameters"
                  << std::endl;
@@ -2039,13 +2040,13 @@ namespace stan {
     }
   }
 
-    void validate_quadratic_optimizer_control::optimizer()(
-      const quadratic_optimzier_control& quad_fun,
+    void validate_quadratic_optimizer_control::operator()(
+      const quadratic_optimizer_control& quad_fun,
       const variable_map& var_map,
       bool& pass,
       std::ostream& error_msgs) const {
-      validate_algevra_solver_control_args(quad_fun, var_map, pass,
-                                           error_msgs);
+      validate_quadratic_optimizer_control_args(quad_fun, var_map, pass,
+                                                error_msgs);
     }
     boost::phoenix::function<validate_quadratic_optimizer_control>
       validate_quadratic_optimizer_f;
