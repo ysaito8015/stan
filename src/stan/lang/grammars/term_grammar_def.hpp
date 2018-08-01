@@ -282,32 +282,32 @@ namespace stan {
           [validate_algebra_solver_f(_val, boost::phoenix::ref(var_map_),
                                      _pass, boost::phoenix::ref(error_msgs_))];
 
-      // quadratic_optimizer_control_r.name("expression");
-      // quadratic_optimizer_control_r
-      //   %= lit("quadratic_optimizer")  // >> no_skip[!char_("a-zA-Z0-9_")]
-      //   > lit('(')
-      //   > identifier_r          // 1) H function name (function only)
-      //   > lit(',')
-      //   > identifier_r          // 2) v function name (function only)
-      //   > lit(',')
-      //   > identifier_r          // 3) a function name (function only)
-      //   > lit(',')
-      //   > identifier_r          // 4) b function name (function only)
-      //   > lit(',')
-      //   > expression_g(_r1)     // 5) theta
-      //   > lit(',')
-      //   > expression_g(_r1)     // 6) delta (data only)
-      //   > lit(',')
-      //   > expression_g(_r1)     // 7) delta_int (integer data only)
-      //   > lit(',')
-      //   > expression_g(_r1)     // 8) number of unknowns (interger data only)
-      //   > lit(',')
-      //   > expression_g(_r1)     // 9) tolerance (data only)
-      //   > lit(')')
-      //     [validate_quadratic_optimizer_control_f(_val,
-      //                                  boost::phoenix::ref(var_map_),
-      //                                  _pass,
-      //                                  boost::phoenix::ref(error_msgs_))];
+      quadratic_optimizer_control_r.name("expression");
+      quadratic_optimizer_control_r
+        %= (lit("quadratic_optimizer") >> no_skip[!char_("a-zA-Z0-9_")])
+        > lit('(')
+        > identifier_r          // 1) H function name (function only)
+        > lit(',')
+        > identifier_r          // 2) v function name (function only)
+        > lit(',')
+        > identifier_r          // 3) a function name (function only)
+        > lit(',')
+        > identifier_r          // 4) b function name (function only)
+        > lit(',')
+        > expression_g(_r1)     // 5) theta
+        > lit(',')
+        > expression_g(_r1)     // 6) delta (data only)
+        > lit(',')
+        > expression_g(_r1)     // 7) delta_int (integer data only)
+        > lit(',')
+        > expression_g(_r1)     // 8) number of unknowns (interger data only)
+        > lit(',')
+        > expression_g(_r1)     // 9) tolerance (data only)
+        > lit(')')
+          [validate_quadratic_optimizer_control_f(_val,
+                                       boost::phoenix::ref(var_map_),
+                                       _pass,
+                                       boost::phoenix::ref(error_msgs_))];
 
       map_rect_r.name("map_rect");
       map_rect_r

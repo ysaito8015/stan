@@ -625,7 +625,7 @@ namespace stan {
                       const variable_map& var_map, bool& pass,
                       std::ostream& error_msgs) const;
     };
-    extern boost::phoenix::function<quadratic_optimizer_control>
+    extern boost::phoenix::function<validate_quadratic_optimizer_control>
     validate_quadratic_optimizer_control_f;
 
     // called from: term_grammar

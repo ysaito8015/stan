@@ -39,9 +39,11 @@ transformed data {
   int delta_int[0];
   vector[2] x;
   real tol = 1e-3;
-
-  // x = quadratic_optimizer(H, v, a, b, theta, delta, delta_int, tol);
-  x = quadratic_optimizer(theta, delta, delta_int, tol);
+  int n_unknowns = 1;
+  
+  x = quadratic_optimizer(H, v, a, b, theta, delta, delta_int, n_unknowns, tol);
+  //                       1, 2, 3, 4, 5,    6,     7,         8,          9
+  //  x = quadratic_optimizer(theta, delta, delta_int, tol);
 }
 
 parameters {

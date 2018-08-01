@@ -1894,10 +1894,10 @@ namespace stan {
 
     template <class T>
     void validate_quadratic_optimizer_control_args(
-        const T& quad_fun,
-        const variable_map& var_map,
-        bool& pass,
-        std::ostream& error_msgs) {
+                                                   const T& quad_fun,
+                                                   const variable_map& var_map,
+                                                   bool& pass,
+                                                   std::ostream& error_msgs) {
       pass = true;
       // test function argument type
       // 1) H function
@@ -1911,7 +1911,7 @@ namespace stan {
                                                         1), true));  // delta_i
       function_signature_t H_signature(H_result_type, H_arg_types);
       if (!function_signatures::instance()
-            .is_defined(quad_fun.H_function_name_, H_signature)) {
+          .is_defined(quad_fun.H_function_name_, H_signature)) {
         error_msgs << "first argument to "
                    << "quadratic_optimizer"
                    << " must be the name of a function with signature"
@@ -1931,7 +1931,7 @@ namespace stan {
                                                         1), true));  // delta_i
       function_signature_t v_signature(v_result_type, v_arg_types);
       if (!function_signatures::instance()
-            .is_defined(quad_fun.v_function_name_, v_signature)) {
+          .is_defined(quad_fun.v_function_name_, v_signature)) {
         error_msgs << "second argument to "
                    << "quadratic_optimizer"
                    << " must be the name of a function with signature"
@@ -1951,94 +1951,94 @@ namespace stan {
                                                         1), true));  // delta_i
       function_signature_t a_signature(a_result_type, a_arg_types);
       if (!function_signatures::instance()
-            .is_defined(quad_fun.a_function_name_, a_signature)) {
-      error_msgs << "third argument to "
-                 << "quadratic_optimizer"
-                 << " must be the name of a function with signature"
-                 << " (vector, real[], int[]) : vector"
-                 << std::endl;
-      pass = false;
+          .is_defined(quad_fun.a_function_name_, a_signature)) {
+        error_msgs << "third argument to "
+                   << "quadratic_optimizer"
+                   << " must be the name of a function with signature"
+                   << " (vector, real[], int[]) : vector"
+                   << std::endl;
+        pass = false;
       }
 
-    // 4) b function
-    expr_type b_result_type(double_type(), 0);
-    // expr_type b_result_type(expr_type(double_type(), 0), true);
-    std::vector<function_arg_type> b_arg_types;
-    b_arg_types.push_back(function_arg_type(expr_type(vector_type(),
-                                                      0), true));  // theta
-    b_arg_types.push_back(function_arg_type(expr_type(double_type(),
-                                                      1), true));  // delta
-    b_arg_types.push_back(function_arg_type(expr_type(int_type(),
-                                                      1), true));  // delta_i
-    function_signature_t b_signature(b_result_type, b_arg_types);
-    if (!function_signatures::instance()
+      // 4) b function
+      expr_type b_result_type(double_type(), 0);
+      // expr_type b_result_type(expr_type(double_type(), 0), true);
+      std::vector<function_arg_type> b_arg_types;
+      b_arg_types.push_back(function_arg_type(expr_type(vector_type(),
+                                                        0), true));  // theta
+      b_arg_types.push_back(function_arg_type(expr_type(double_type(),
+                                                        1), true));  // delta
+      b_arg_types.push_back(function_arg_type(expr_type(int_type(),
+                                                        1), true));  // delta_i
+      function_signature_t b_signature(b_result_type, b_arg_types);
+      if (!function_signatures::instance()
           .is_defined(quad_fun.b_function_name_, b_signature)) {
-    error_msgs << "fourth argument to "
-               << "quadratic_optimizer"
-               << " must be the name of a function with signature"
-               << " (vector, real[], int[]) : real"
-               << std::endl;
-    pass = false;
-    }
+        error_msgs << "fourth argument to "
+                   << "quadratic_optimizer"
+                   << " must be the name of a function with signature"
+                   << " (vector, real[], int[]) : real"
+                   << std::endl;
+        pass = false;
+      }
 
-    // test regular argument types
-    if (quad_fun.theta_.expression_type() != expr_type(vector_type(), 0)) {
-      error_msgs << "fifth argument to quadratic_optimizer"
-                 << " must have type vector for parameters;"
-                 << " found type = "
-                 << quad_fun.theta_.expression_type()
-                 << ". " << std::endl;
-      pass = false;
-    }
-    if (quad_fun.delta_.expression_type() != expr_type(double_type(), 1)) {
-      error_msgs << "sixth argument to quadratic optimizer"
-                 << " must have type real[] for real data;"
-                 << " found type = "
-                 << quad_fun.delta_.expression_type()
-                 << ". " << std::endl;
-      pass =  false;
-    }
-    if (quad_fun.delta_int_.expression_type() != expr_type(int_type(), 1)) {
-      error_msgs << "seventh argument to quadratic optimizer"
-                 << " must have type int[] for integer data;"
-                 << " found type = "
-                 << quad_fun.delta_int_.expression_type()
-                 << ". " << std::endl;
-      pass = false;
-    }
-    if (quad_fun.n_.expression_type() != expr_type(int_type(), 0)) {
-      error_msgs << "eigth argument to quadratic optimizer"
-                 << " must have type int for number of states;"
-                 << " found type = "
-                 << quad_fun.n_.expression_type()
-                 << ". " << std::endl;
-      pass = false;
-    }
-    if (!quad_fun.tol_.expression_type().is_primitive()) {
-      error_msgs << "ninth argument to quadratic optimizer"
-                 << " must have type int or real for tolerance;"
-                 << " found type = "
-                 << quad_fun.tol_.expression_type()
-                 << ". " << std::endl;
-      pass = false;
-    }
+      // test regular argument types
+      if (quad_fun.theta_.expression_type() != expr_type(vector_type(), 0)) {
+        error_msgs << "fifth argument to quadratic_optimizer"
+                   << " must have type vector for parameters;"
+                   << " found type = "
+                   << quad_fun.theta_.expression_type()
+                   << ". " << std::endl;
+        pass = false;
+      }
+      if (quad_fun.delta_.expression_type() != expr_type(double_type(), 1)) {
+        error_msgs << "sixth argument to quadratic optimizer"
+                   << " must have type real[] for real data;"
+                   << " found type = "
+                   << quad_fun.delta_.expression_type()
+                   << ". " << std::endl;
+        pass =  false;
+      }
+      if (quad_fun.delta_int_.expression_type() != expr_type(int_type(), 1)) {
+        error_msgs << "seventh argument to quadratic optimizer"
+                   << " must have type int[] for integer data;"
+                   << " found type = "
+                   << quad_fun.delta_int_.expression_type()
+                   << ". " << std::endl;
+        pass = false;
+      }
+      if (quad_fun.n_.expression_type() != expr_type(int_type(), 0)) {
+        error_msgs << "eigth argument to quadratic optimizer"
+                   << " must have type int for number of states;"
+                   << " found type = "
+                   << quad_fun.n_.expression_type()
+                   << ". " << std::endl;
+        pass = false;
+      }
+      if (!quad_fun.tol_.expression_type().is_primitive()) {
+        error_msgs << "ninth argument to quadratic optimizer"
+                   << " must have type int or real for tolerance;"
+                   << " found type = "
+                   << quad_fun.tol_.expression_type()
+                   << ". " << std::endl;
+        pass = false;
+      }
 
-    // test data-only variables do not have parameters (int locals OK)
-    if (has_var(quad_fun.delta_, var_map)) {
-      error_msgs << "sixth argument to quadratic_optimizer"
-                 << " (real data)"
-                 << " must be data only and not reference parameters"
-                 << std::endl;
-      pass = false;
+      // test data-only variables do not have parameters (int locals OK)
+      if (has_var(quad_fun.delta_, var_map)) {
+        error_msgs << "sixth argument to quadratic_optimizer"
+                   << " (real data)"
+                   << " must be data only and not reference parameters"
+                   << std::endl;
+        pass = false;
+      }
+      if (has_var(quad_fun.tol_, var_map)) {
+        error_msgs << "ninth argument to quadratic optimizer"
+                   << " (tolerance)"
+                   << " must be data only and not reference parameters"
+                   << std::endl;
+        pass = false;
+      }
     }
-    if (has_var(quad_fun.tol_, var_map)) {
-      error_msgs << "ninth argument to quadratic optimizer"
-                 << " (tolerance)"
-                 << " must be data only and not reference parameters"
-                 << std::endl;
-      pass = false;
-    }
-  }
 
     void validate_quadratic_optimizer_control::operator()(
       const quadratic_optimizer_control& quad_fun,
@@ -2049,7 +2049,7 @@ namespace stan {
                                                 error_msgs);
     }
     boost::phoenix::function<validate_quadratic_optimizer_control>
-      validate_quadratic_optimizer_f;
+    validate_quadratic_optimizer_control_f;
     
     void validate_map_rect::operator()(
             map_rect& mr, const variable_map& var_map,
