@@ -597,6 +597,53 @@ TEST(langAst, solveAlgebra) {
     EXPECT_EQ(expr_type(vector_type(), 0), e2.expression_type());
 }
 
+TEST(langAst, quadraticOpitmizer) {
+  using stan::lang::quadratic_optimizer_control;
+  using stan::lang::variable;
+  using stan::lang::expr_type;
+  using stan::lang::expression;
+
+  quadratic_optimizer_control so;  // bull ctor should work and not raise error
+  std::string H_function_name = "Dan";
+  std::string v_function_name = "Brownian";
+  std::string a_function_name = "Motion";
+  std::string b_function_name = "Forever";
+
+  variable theta("theta_var_name");
+  theta.set_type(vector_type(), 0);  // vector from Eigen
+
+  variable delta("delta_var_name");
+  delta.set_type(double_type(), 1);  // std vector (aka plain old vector)
+
+  variable delta_int("delta_int_var_name");
+  delta_int.set_type(int_type(), 1);
+
+  variable n("n_var_name");
+  n.set_type(int_type(), 0);
+
+  variable tol("tol");
+  tol.set_type(double_type(), 0);
+
+  // example of instantiation
+  quadratic_optimizer_control 
+    so2(H_function_name, v_function_name, a_function_name, b_function_name,
+        theta, delta, delta_int, n, tol);
+
+  // test we get the right types back
+  EXPECT_EQ(H_function_name, so2.H_function_name_);
+  EXPECT_EQ(v_function_name, so2.v_function_name_);
+  EXPECT_EQ(a_function_name, so2.a_function_name_);
+  EXPECT_EQ(b_function_name, so2.b_function_name_);
+  EXPECT_EQ(theta.type_, so2.theta_.expression_type());
+  EXPECT_EQ(delta.type_, so2.delta_.expression_type());
+  EXPECT_EQ(delta_int.type_, so2.delta_int_.expression_type());
+  EXPECT_EQ(n.type_, so2.n_.expression_type());
+  EXPECT_EQ(tol.type_, so2.tol_.expression_type());
+
+  expression e2(so2);
+  EXPECT_EQ(expr_type(vector_type(), 0), e2.expression_type());
+}
+
 void testTotalDims(int expected_total_dims,
                    const stan::lang::base_expr_type& base_type,
                    size_t num_dims) {

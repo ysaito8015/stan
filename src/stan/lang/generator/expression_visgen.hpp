@@ -237,7 +237,7 @@ namespace stan {
         o_ << ", ";
         generate_expression(fx.delta_int_, NOT_USER_FACING, o_);
         o_ << ", ";
-        generate_expression(fx.n_), NOT_USER_FACING, o_);
+        generate_expression(fx.n_, NOT_USER_FACING, o_);
         o_ << ", pstream__, ";
         generate_expression(fx.tol_, NOT_USER_FACING, o_);
         o_ << ")";
