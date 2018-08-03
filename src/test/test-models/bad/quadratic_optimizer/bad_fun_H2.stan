@@ -1,8 +1,8 @@
 functions {
-  matrix H (vector theta,
+  real H (vector theta,
             real[] delta,
             int[] delta_int) {
-    matrix[2, 2] result;
+    real result;
     return result;
   }
 

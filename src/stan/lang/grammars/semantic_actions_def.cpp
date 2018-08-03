@@ -1991,7 +1991,7 @@ namespace stan {
         pass = false;
       }
       if (quad_fun.delta_.expression_type() != expr_type(double_type(), 1)) {
-        error_msgs << "sixth argument to quadratic optimizer"
+        error_msgs << "sixth argument to quadratic_optimizer"
                    << " must have type real[] for real data;"
                    << " found type = "
                    << quad_fun.delta_.expression_type()
@@ -1999,7 +1999,7 @@ namespace stan {
         pass =  false;
       }
       if (quad_fun.delta_int_.expression_type() != expr_type(int_type(), 1)) {
-        error_msgs << "seventh argument to quadratic optimizer"
+        error_msgs << "seventh argument to quadratic_optimizer"
                    << " must have type int[] for integer data;"
                    << " found type = "
                    << quad_fun.delta_int_.expression_type()
@@ -2007,7 +2007,7 @@ namespace stan {
         pass = false;
       }
       if (quad_fun.n_.expression_type() != expr_type(int_type(), 0)) {
-        error_msgs << "eigth argument to quadratic optimizer"
+        error_msgs << "eigth argument to quadratic_optimizer"
                    << " must have type int for number of states;"
                    << " found type = "
                    << quad_fun.n_.expression_type()
@@ -2015,7 +2015,7 @@ namespace stan {
         pass = false;
       }
       if (!quad_fun.tol_.expression_type().is_primitive()) {
-        error_msgs << "ninth argument to quadratic optimizer"
+        error_msgs << "ninth argument to quadratic_optimizer"
                    << " must have type int or real for tolerance;"
                    << " found type = "
                    << quad_fun.tol_.expression_type()
@@ -2032,7 +2032,7 @@ namespace stan {
         pass = false;
       }
       if (has_var(quad_fun.tol_, var_map)) {
-        error_msgs << "ninth argument to quadratic optimizer"
+        error_msgs << "ninth argument to quadratic_optimizer"
                    << " (tolerance)"
                    << " must be data only and not reference parameters"
                    << std::endl;

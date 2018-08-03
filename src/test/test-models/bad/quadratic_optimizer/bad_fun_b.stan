@@ -21,7 +21,7 @@ functions {
   }
 
   real b (vector theta,
-          real[] delta,
+          real delta,
           int[] delta_int) {
     real result;
     return result;

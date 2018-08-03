@@ -13,10 +13,10 @@ functions {
     return result;
   }
 
-  vector a (vector theta,
+  real a (vector theta,
             real[] delta,
             int[] delta_int) {
-    vector[2] result;
+    real result;
     return result;
   }
 

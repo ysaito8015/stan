@@ -1,31 +1,36 @@
 functions {
   matrix H (vector theta,
-            real[] delta,
+            real delta,
             int[] delta_int) {
-    matrix[2, 2] result;
-    return result;
-  }
+              matrix[2, 2] result;
+              return result;
+            }
 
   vector v (vector theta,
             real[] delta,
             int[] delta_int) {
-    vector[2] result;
-    return result;
-  }
+              vector[2] result;
+              return result;
+            }
 
   vector a (vector theta,
             real[] delta,
             int[] delta_int) {
-    vector[2] result;
-    return result;
-  }
+              vector[2] result;
+              return result;
+            }
 
   real b (vector theta,
           real[] delta,
           int[] delta_int) {
-    real result;
-    return result;
-  }
+          real result;
+          return result;
+        }
+}
+
+
+data {
+
 }
 
 transformed data {
@@ -38,14 +43,19 @@ transformed data {
   
   x = quadratic_optimizer(H, v, a, b, theta, delta, delta_int, n_unknowns, tol);
 }
+
 parameters {
   vector[2] theta_p;
   real dummy_parameter;
 }
+
 transformed parameters {
   vector[2] x_p;
+
   x_p = quadratic_optimizer(H, v, a, b, theta, delta, delta_int, n_unknowns, tol);
+
 }
+
 model {
   dummy_parameter ~ normal(0, 1);
 }

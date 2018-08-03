@@ -14,7 +14,7 @@ functions {
   }
 
   vector a (vector theta,
-            real[] delta,
+            real delta,
             int[] delta_int) {
     vector[2] result;
     return result;

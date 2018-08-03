@@ -33,19 +33,8 @@ transformed data {
   real delta[0];
   int delta_int[0];
   vector[2] x;
-  real tol = 1e-3;
   int n_unknowns = 1;
+  vector[2] tol;
   
   x = quadratic_optimizer(H, v, a, b, theta, delta, delta_int, n_unknowns, tol);
-}
-parameters {
-  vector[2] theta_p;
-  real dummy_parameter;
-}
-transformed parameters {
-  vector[2] x_p;
-  x_p = quadratic_optimizer(H, v, a, b, theta, delta, delta_int, n_unknowns, tol);
-}
-model {
-  dummy_parameter ~ normal(0, 1);
 }
