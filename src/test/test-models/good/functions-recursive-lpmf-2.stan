@@ -6,7 +6,7 @@ functions {
       prob =  1.0;
     else
       prob = fib_lpmf(n - 1) + fib_lpmf(n - 2);
-    return log(prob);
+    return prob;
   }
 }
 transformed data {
